@@ -45,6 +45,20 @@ The confusion matrix reveals both progress and limits after macro-aligned tuning
 
 **Context against benchmarks:** SVM RBF still achieves higher macro F1 (0.590) and class-0 recall (56.4%, 31/55) on the same split. Random Forest is retained for **Gini feature importance** (Section 8), not because it wins every metric."""
 
+SYNTHESIS_CELL = """**Ranking comparison (Section 8.1).** Random Forest Gini importance and cluster mean-range differentiation use different metrics and answer different questions. On this cohort, **only CRP/ALB overlaps in the top-5 of both lists** (notebook output: `Overlap in top 5: {'CRP/ALB'}`).
+
+| Feature | RF rank | Cluster diff rank |
+|---------|---------|-------------------|
+| CA19-9 | 1 | 15 |
+| CEA | 2 | 20 (lowest) |
+| Prealbumin | 3 | 9 |
+| CRP/ALB | 4 | 2 |
+| CRP | 10 | 1 |
+
+**Correct reading:** Partial convergence at the clinical-theme level (tumor burden, nutrition, inflammation), **not** identical feature rankings. Tumor markers dominate supervised prediction; inflammatory/hepatobiliary markers dominate unsupervised phenotypes. Do not claim CA19-9 or CEA "define" clusters - the chart shows the opposite."""
+
+CONVERGENCE_PARA = """**Partial convergence.** Only CRP/ALB ranks in both top-5 lists. RF and K-Means weight different markers because prediction and phenotype grouping are different tasks. Together they still support a coherent clinical story about tumor burden, nutrition, and inflammation - without implying the same features drive both analyses equally."""
+
 CELL_153 = """### 7.5 Model Comparison: Benchmarking Random Forest Against Alternatives
 
 To validate our model choice, we benchmarked the **f1_macro tuned** Random Forest against three alternatives - Logistic Regression, SVM RBF, and Gradient Boosting - on the same train-test split with the same random seed.
@@ -83,9 +97,26 @@ def main():
                 line.replace("AUC (0.613)", "AUC (0.563)")
                 for line in cell["source"]
             ]
+        if src.strip() == (
+            "Convergence of top RF and cluster-differentiating features suggests biological "
+            "structure drives both prediction and subgrouping. Divergence indicates features "
+            "that separate clusters without strong supervised signal, or vice versa."
+        ):
+            cell["source"] = [SYNTHESIS_CELL + "\n"]
+        if "**Convergence.** Features that rank highly for both RF importance and cluster differentiation" in src:
+            cell["source"] = [
+                CONVERGENCE_PARA + "\n" if "**Convergence.**" in line else line
+                for line in cell["source"]
+            ]
+        if "Paragraph 4" in src and "Bridging insight" in src and "Convergence between supervised importances" in src:
+            cell["source"] = [
+                "**Paragraph 4 - Bridging insight.** Partial convergence (CRP/ALB in both top-5 lists; shared clinical themes of tumor burden, nutrition, and inflammation) suggests preoperative labs capture structured biological variation - even though RF and clustering rank different markers highest. These findings support exploratory risk stratification but cannot replace clinical judgment and require external validation before any clinical application.\n"
+                if "Bridging insight" in line and "Convergence between" in line else line
+                for line in cell["source"]
+            ]
 
     NB_PATH.write_text(json.dumps(nb, ensure_ascii=False, indent=1), encoding="utf-8")
-    print("Updated notebook markdown cells 143, 145, 146, 153")
+    print("Updated notebook markdown cells 143, 145, 146, 153 and Section 8 synthesis text")
 
 
 if __name__ == "__main__":

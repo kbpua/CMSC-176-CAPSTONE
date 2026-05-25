@@ -234,7 +234,7 @@ FIGURE_GUIDE = [
     },
     {
         "num": 14, "file": "cluster_survival_overlay.png", "section": "6.7",
-        "shows": "Grouped bar chart: survival rates per cluster - 70.1%, 69.6%, 63.2%. Chi-square p=0.2546; Cram - r's V~0.056.",
+        "shows": "Grouped bar chart: survival rates per cluster - 70.1%, 69.6%, 63.2%. Chi-square p=0.2546; Cramer's V ~0.048.",
         "interpretation": "Cluster 2 directionally lowest survival but association NOT statistically significant. Negligible effect size.",
         "clinical_interpretation": (
             "High-inflammation Cluster 2 shows about 7 percentage points lower 1-year survival than Clusters 0 and 1 "
@@ -262,7 +262,7 @@ FIGURE_GUIDE = [
         "implications": "Bridges unsupervised structure to supervised outcome; explains why labs-only models plateau.",
         "clinical_implication": (
             "Use this to justify missing variables in limitations: 'The overlap shows why our model caps around "
-            "AUC 0.61 - preoperative bloodwork captures part of the story, not surgery, pathology, or comorbidity.'"
+            "AUC 0.563 - preoperative bloodwork captures part of the story, not surgery, pathology, or comorbidity.'"
         ),
         "point_out": "Both classes intermingle - explains modest AUC.",
         "dont_claim": "Do not claim clear class separation in PCA space.",
@@ -358,20 +358,32 @@ FIGURE_GUIDE = [
     },
     {
         "num": 21, "file": "synthesis_comparison.png", "section": "8.1",
-        "shows": "Side-by-side top-10 RF importance vs cluster-differentiation rankings.",
-        "interpretation": "Overlap in CEA, Prealbumin, CA19-9, and inflammatory markers - supervised and unsupervised analyses converge.",
+        "shows": (
+            "Side-by-side RF Gini importance vs cluster mean-range rankings. "
+            "Top-5 overlap in notebook output: CRP/ALB only."
+        ),
+        "interpretation": (
+            "Partial convergence, not full overlap. RF ranks CA19-9 (#1), CEA (#2), Prealbumin (#3); "
+            "clustering ranks CRP (#1), CRP/ALB (#2), bilirubin (#3-4), SII (#5). "
+            "CA19-9 is cluster rank #15; CEA is #20 (lowest differentiator). "
+            "Both analyses touch inflammation/nutrition/tumor biology, but they weight different markers."
+        ),
         "clinical_interpretation": (
-            "Two independent methods - one predicting survival, one grouping similar patients - both highlight the "
-            "same clinical themes: tumor burden (CEA, CA19-9), nutritional status (prealbumin), and systemic inflammation. "
-            "That convergence is medically coherent even though neither method achieves strong standalone performance."
+            "Supervised RF asks: which labs predict 1-year survival? Unsupervised K-Means asks: "
+            "which labs separate patient phenotypes? Tumor markers dominate RF; inflammatory and "
+            "hepatobiliary markers dominate clusters. CRP/ALB bridges both — the one feature in "
+            "both top-5 lists. Prealbumin (#3 RF, #9 cluster) shows moderate alignment."
         ),
-        "implications": "Core project contribution: mutual validation of limited preoperative signal.",
+        "implications": (
+            "Synthesis value = complementary views of the same weak preoperative signal, "
+            "not proof that the same features drive both tasks."
+        ),
         "clinical_implication": (
-            "This is your strongest defense slide: 'We are not claiming excellent prediction. We are showing that "
-            "when two different analyses point to the same preoperative markers, we gain confidence that those markers "
-            "truly describe surgical risk biology - and that adding staging data should target the same pathways.'"
+            "Defense framing: 'We do not claim CA19-9 defines clusters — it does not in this chart. "
+            "We claim both analyses independently point to tumor burden, nutrition, and inflammation "
+            "pathways, with CRP/ALB as the explicit ranking overlap.'"
         ),
-        "point_out": "Convergence on inflammation/tumor/nutrition markers - synthesis headline.",
-        "dont_claim": "Do not claim convergence proves strong prediction - it shows directional alignment.",
+        "point_out": "Only CRP/ALB in both top-5; tumor markers predict survival, inflammation markers define phenotypes.",
+        "dont_claim": "Do not say CA19-9 or CEA 'define clusters' or that rankings fully converge.",
     },
 ]

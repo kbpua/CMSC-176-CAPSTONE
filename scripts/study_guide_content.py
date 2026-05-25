@@ -6,7 +6,7 @@ from audit_content import FIGURES, PREPROCESSING_DECISIONS, PROJECT, RESULTS, se
 STUDY_GUIDE = {
     "title": "PCSPF Capstone — Ultimate Study Guide",
     "subtitle": "Complete Defense Preparation: Numbers, Code, Methods, Visualizations, and Q&A",
-    "version": "1.2",
+    "version": "1.4",
 }
 
 CORE_FINDING = (
@@ -39,7 +39,7 @@ EXECUTIVE_OVERVIEW = {
         "Primary RF (f1_macro tuned): 61.93% test accuracy, macro F1 0.550, AUC 0.563, class-0 recall 36.4% (20/55).",
         "Legacy f1 tuning (reference): 71.02% accuracy, macro F1 0.507, class-0 recall 10.9% (6/55) — higher accuracy, worse minority recall.",
         "K-Means k=3: three phenotypes with survival ranging 63.2%-70.1%; chi-square p = 0.2546 (not significant).",
-        "Top RF features (CA19-9, CEA, Prealbumin) overlap with cluster differentiation - directional convergence.",
+        "Synthesis (Section 8.1): only CRP/ALB overlaps in both top-5 rankings; RF emphasizes tumor/nutrition, clusters emphasize inflammation/bilirubin.",
         CORE_FINDING,
     ],
     "how_to_use": (
@@ -297,7 +297,7 @@ NUMBER_BANK = {
         ("Cluster 1", "204 patients (23.2%) — 69.6% survival"),
         ("Cluster 2", "155 patients (17.7%) — 63.2% survival"),
         ("Chi-square p", "0.2546 (NOT significant at α=0.05)"),
-        ("Cramér's V", "~0.056 (negligible effect)"),
+        ("Cramér's V", f"~{RESULTS['cramers_v']} (negligible effect)"),
     ],
     "PCA": [
         ("PC1 variance", "20.3%"),
@@ -398,7 +398,7 @@ UNSUPERVISED_COMPARISON_A = {
     "title": "Table 9C — Cluster quality and survival association",
     "headers": ["Method (k=3)", "Silhouette", "Chi-sq p", "Cramér's V", "Survival Spread"],
     "rows": [
-        ["K-Means", "Highest (~0.133)", "0.2546", "~0.056", "70.1% → 63.2%"],
+        ["K-Means", "Highest (~0.133)", "0.2546", f"~{RESULTS['cramers_v']}", "70.1% → 63.2%"],
         ["GMM", "Lower", "~0.53", "Negligible", "Similar band"],
         ["Agglomerative Ward", "Mid", "~0.65", "Negligible", "Similar band"],
         ["DBSCAN (best)", "Outlier pockets", "<0.01", "Varies", "Uneven"],
@@ -459,7 +459,7 @@ DEFENSE_SCRIPTS = [
      "Contextualize: GMM and Ward also fail significance — algorithm choice is not the issue. "
      "Reframe: Cluster 2 shows directionally lowest survival (63.2% vs ~70%) — coherent clinical "
      "story without statistical proof. Value: Scientific honesty strengthens credibility."),
-    ("Cramér's V ≈ 0.056 (negligible)",
+    (f"Cramér's V ≈ {RESULTS['cramers_v']} (negligible)",
      "Acknowledge: Effect size is negligible even if sample size were larger. "
      "Contextualize: p-value alone can mislead with n=878 — V confirms association is weak in "
      "magnitude, not just non-significant. Reframe: Clustering adds descriptive phenotypes, not "
@@ -472,8 +472,8 @@ DEFENSE_SCRIPTS = [
     ("Baseline RF 68.18% below majority baseline 68.8%",
      "Acknowledge: Untuned RF underperforms predicting-all-survivors. Contextualize: Untuned model "
      "with 100 trees and default depth still tries to predict minority class, hurting accuracy. "
-     "Reframe: Tuning to 71.02% shows hyperparameter search adds value; untuned result motivates "
-     "GridSearchCV. Value: Shows full pipeline narrative from baseline → tuned."),
+     "Reframe: Primary f1_macro tuning improves macro F1 (0.550) and class-0 recall (36.4%) versus "
+     "untuned RF and legacy f1 objective. Value: Shows full pipeline from baseline → objective-aligned tuning."),
 ]
 
 # ---------------------------------------------------------------------------
@@ -483,19 +483,20 @@ QA_BANK = [
     ("What if you removed derived ratios (NLR, PLR, SII, CRP/ALB) and retrained?",
      "VIF would drop, but clinically validated inflammation indices would be lost. RF handles "
      "multicollinearity via random feature subsets. Retraining might shift importance rankings "
-     "slightly but AUC would likely stay in the same ~0.61 band given weak overall signal."),
+     "slightly but AUC would likely stay in the same ~0.56 band given weak overall signal."),
     ("Why did GridSearchCV pick the least regularized params?",
-     "scoring='f1' on positive class rewards catching survivors (majority). Deep trees maximize "
-     "training F1, producing 100% train accuracy. Less regularized params win CV even though they "
-     "overfit — we document this and show regularization trade-offs separately."),
+     "Legacy scoring='f1' (binary) rewards catching survivors (majority). Deep trees maximize "
+     "training F1, producing 100% train accuracy — that is why we moved to f1_macro as primary. "
+     "Primary grid uses depth 5 / leaf 4 regularization; legacy row kept for before/after comparison."),
     ("Is 176 test patients enough for reliable evaluation?",
      "176 is modest — class 0 has only 55 test samples, so recall estimates have wide confidence "
      "intervals. Stratification preserves proportions. External validation on another cohort would "
      "be needed for deployment claims."),
     ("Why not nested cross-validation?",
      "Nested CV is best practice for unbiased performance estimation but computationally expensive "
-     "with 108 grid combinations. We use holdout test set for final evaluation and 5-fold CV for "
-     "tuning — standard for course scope; nested CV listed as future work."),
+     "with 135 regularized grid combinations per objective (plus legacy 108-combo f1 row). "
+     "We use holdout test set for final evaluation and 5-fold CV for tuning — standard for course "
+     "scope; nested CV listed as future work."),
     ("How do you know original values if data is pre-standardized?",
      "We work with released z-scores (mean≈0, std≈1). Rankings, correlations, and model splits are "
      "valid. Absolute clinical units are not recoverable from this file — noted as limitation."),
@@ -535,7 +536,7 @@ QA_BANK = [
      "Each tree trains on a bootstrap sample (~63% unique points); predictions vote/average. "
      "Averaging decorrelated trees reduces variance vs single deep tree."),
     ("Why 5-fold and not 10-fold CV?",
-     "5-fold balances bias-variance in CV estimate with compute cost (108 combos × 5 fits). "
+     "5-fold balances bias-variance in CV estimate with compute cost (135 combos × 5 fits per objective). "
      "10-fold would be more expensive with minimal change for n=702."),
     ("What is the difference between Gini importance and permutation importance?",
      "Gini: mean impurity decrease at splits using a feature. Permutation: shuffles feature, "
@@ -558,8 +559,8 @@ QA_BANK = [
      "Three clusters map to low/medium/high inflammation phenotypes clinically; k=2 merges "
      "distinct hepatobiliary vs inflammation profiles."),
     ("How does synthesis add value if both analyses are weak?",
-     "Independent convergence on CEA, Prealbumin, CA19-9 strengthens biomarker narrative beyond "
-     "either analysis alone — mutual validation of limited signal."),
+     "Partial ranking overlap (CRP/ALB in both top-5 lists) plus shared clinical themes "
+     "(tumor burden, nutrition, inflammation) strengthens the biomarker narrative beyond either analysis alone."),
 ]
 
 # ---------------------------------------------------------------------------
@@ -957,9 +958,9 @@ SECTION_WALKTHROUGHS = {
             "Did not claim clinical deployability",
         ],
         "interpretation": (
-            "Supervised and unsupervised analyses converge on CEA, Prealbumin, CA19-9, and inflammatory "
-            "markers — mutual validation of limited preoperative signal. Cluster 2 lowest survival aligns "
-            "with high-inflammation profile."
+            "Supervised RF highlights CA19-9, CEA, Prealbumin for survival prediction; "
+            "clustering highlights CRP, bilirubin, SII for phenotypes. "
+            "Only CRP/ALB overlaps in both top-5 rankings — partial, not full, convergence."
         ),
         "professor_questions": [
             "What is the synthesis contribution? — Independent methods pointing same direction strengthens biomarker story.",
@@ -1070,8 +1071,9 @@ TECHNIQUE_DEEP_DIVES = {
         "features is considered; trees vote for classification. Gini impurity measures node purity — "
         "splits minimize weighted Gini. Feature importance = mean decrease in Gini across splits using "
         "that feature. class_weight='balanced' sets weight_c = n / (n_classes × count_c) — class 0 "
-        "~1.60, class 1 ~0.73. max_depth=15 allows deep trees (overfitting); min_samples_leaf=1 allows "
-        "single-sample leaves. Trees do NOT need scaling because splits are rank-based on individual features."
+        "~1.60, class 1 ~0.73. Primary f1_macro winner: max_depth=5, min_samples_leaf=4, "
+        "min_samples_split=10 — shallower than legacy depth=15 model (100% train). "
+        "Trees do NOT need scaling because splits are rank-based on individual features."
     ),
     "K-Means": (
         "How it works: Initialize k centroids → assign each point to nearest centroid (Euclidean distance) "
@@ -1093,15 +1095,16 @@ TECHNIQUE_DEEP_DIVES = {
         "NOT for clustering or classification."
     ),
     "GridSearchCV": (
-        "Exhaustive search over 108 hyperparameter combinations. StratifiedKFold(n=5) creates 5 train/val "
-        "splits preserving class ratio. scoring='f1' optimizes binary F1 on positive class (class 1) — "
-        "explains CV ~0.809 vs test macro F1 0.507. CV F1 measures validation-fold performance averaged "
+        "Exhaustive search over hyperparameter grids. StratifiedKFold(n=5) creates 5 train/val "
+        "splits preserving class ratio. Primary scoring='f1_macro' (CV ~0.579) aligns with test "
+        "macro F1 0.550. Legacy scoring='f1' (binary) reported CV ~0.809 but test macro F1 0.507 — "
+        "different metric and overfit profile. CV scores measure validation-fold performance averaged "
         "over 5 folds; NOT the same as test set macro F1."
     ),
     "Chi-square test": (
         "Tests independence of two categorical variables (cluster × survival). p-value = probability of "
         "observed table if variables independent. p=0.2546 > 0.05 → fail to reject independence. Cramér's V "
-        "adds effect size: V ≈ 0.056 on 0–1 scale — negligible regardless of sample size."
+        "adds effect size: V ≈ 0.048 on 0–1 scale — negligible regardless of sample size."
     ),
     "D'Agostino-Pearson": (
         "Tests whether distribution is normal using skewness and kurtosis combined. Chosen over Shapiro-Wilk "
@@ -1185,9 +1188,9 @@ WHY_DID_NOT = [
 ]
 
 WHY_NOT_DIFFERENT_MODEL = [
-    ("RF over Logistic Regression", "LR macro F1 ~0.55 vs RF 0.507; LR better balanced metrics but no Gini importance; linear assumption weak given |r|<0.15."),
+    ("RF over Logistic Regression", "LR macro F1 ~0.539 vs RF 0.550 (primary); LR better class-0 recall (61.8%) but no Gini importance; linear assumption weak given |r|<0.15."),
     ("RF over SVM RBF", "SVM best macro F1 (0.590) and AUC (0.622) but no built-in importance — synthesis impossible without SHAP."),
-    ("RF over XGBoost", "Not in course scope; GB benchmark ~0.51 macro F1 similar to RF; RF simpler to defend."),
+    ("RF over XGBoost", "Not in course scope; GB benchmark macro F1 ~0.482; RF simpler to defend with Gini importance."),
     ("RF over single Decision Tree", "Single tree high variance; RF bagging reduces variance; course requires ensemble."),
     ("K-Means over DBSCAN", "DBSCAN p<0.01 but only ~49% assigned; noise labels unusable for full cohort profiling."),
     ("K-Means over GMM", "GMM lower silhouette at k=3; soft assignment adds complexity without survival benefit."),

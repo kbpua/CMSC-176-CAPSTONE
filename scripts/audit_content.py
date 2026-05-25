@@ -34,6 +34,16 @@ RESULTS = {
     "pca_var_pc2": "10.5%",
     "pca_var_cumulative": "30.8%",
     "top_features": ["CA19-9", "CEA", "Prealbumin", "CRP/ALB", "BMI"],
+    "synthesis_top5_rf": ["CA19-9", "CEA", "Prealbumin", "CRP/ALB", "BMI"],
+    "synthesis_top5_cluster": ["CRP", "CRP/ALB", "Directed Bilirubin", "Total Bilirubin", "SII"],
+    "synthesis_top5_overlap": ["CRP/ALB"],
+    "synthesis_reading": (
+        "Partial convergence, not identical rankings. RF top-5 emphasizes tumor markers and "
+        "nutrition (CA19-9, CEA, Prealbumin); cluster top-5 emphasizes inflammation and "
+        "hepatobiliary burden (CRP, bilirubin, SII). Only CRP/ALB overlaps in both top-5 lists "
+        "(notebook: Overlap in top 5 = {'CRP/ALB'}). CA19-9 is RF #1 but cluster #15; CEA is "
+        "RF #2 but cluster #20 — do not claim tumor markers define clusters."
+    ),
     "best_rf_params": {
         "n_estimators": 100,
         "max_depth": 5,
@@ -136,7 +146,7 @@ PREPROCESSING_DECISIONS = [
 
 TECHNIQUES_GLOSSARY = [
     ("Random Forest", "Supervised ensemble of decision trees with bootstrap aggregation and random feature subsets.",
-     "Primary classifier for 1-year survival.", "class_weight=balanced; GridSearchCV; 300 trees, depth 15."),
+     "Primary classifier for 1-year survival.", "class_weight=balanced; primary f1_macro GridSearchCV; 100 trees, depth 5, leaf 4."),
     ("K-Means", "Unsupervised partitioning minimizing within-cluster sum of squared distances.",
      "Patient subgroup discovery.", "k=3; StandardScaler features; n_init=10; seed 42."),
     ("Logistic Regression", "Linear probabilistic classifier with log-odds link.",
@@ -152,7 +162,7 @@ TECHNIQUES_GLOSSARY = [
     ("PCA", "Orthogonal linear projection capturing maximum variance.",
      "2D visualization of clusters.", "PC1 20.3% + PC2 10.5% = 30.8% cumulative."),
     ("GridSearchCV", "Exhaustive hyperparameter search with cross-validation.",
-     "Tune Random Forest.", "108 combinations; 5-fold stratified; scoring=f1 (binary)."),
+     "Tune Random Forest.", "Primary: 135 combos, scoring=f1_macro; legacy f1 row: 108 combos (reference)."),
     ("Cramér's V", "Effect size for categorical association (0 = none, 1 = perfect).",
      "Cluster vs survival after chi-square.", "V ≈ 0.048 — negligible."),
     ("VIF", "Variance inflation factor for multicollinearity.",
@@ -370,13 +380,13 @@ def section_processes():
                 ("7.1", "Baseline RF", "RandomForestClassifier",
                  "100 trees, balanced; fit X_train.", "n_estimators=100", "Acc 68.18% on test.", "Benchmark before tuning.", "First draft model."),
                 ("7.2", "GridSearchCV", "Hyperparameter search",
-                 "108 combos; 5-fold stratified CV; scoring=f1 (binary).",
-                 "Best: 300 trees, depth 15", "CV F1 ~0.809 (binary).", "CV vs test F1 clarified (audit).", "Auto-picked best settings."),
+                 "Three objectives: f1 (legacy), f1_macro (primary), recall_macro (stretch).",
+                 "Primary best: 100 trees, depth 5, leaf 4", "CV macro F1 0.579 (primary).", "Legacy f1 row kept for comparison.", "Aligned tuning with macro F1 evaluation."),
                 ("7.3", "Test evaluation", "Full metric suite",
-                 "Accuracy 71.02%; macro F1 0.507; AUC 0.613; CM; ROC; classification report figures.",
-                 "176-patient holdout", "4 figures saved.", "Train 100% vs test 71% gap documented.", "Scored on unseen patients."),
+                 "Primary f1_macro RF: 61.93% acc; macro F1 0.550; AUC 0.563; CM; ROC; classification report.",
+                 "176-patient holdout", "4 figures saved.", "Class-0 recall 36.4% (20/55) documented.", "Scored on unseen patients."),
                 ("7.3a", "Overfitting assessment (audit)", "Train vs test table",
-                 "100% train accuracy; 29 pp gap; AUC train vs test compared.", "N/A", "Markdown interpretation.", "Memorization documented.", "Model memorized training data."),
+                 "Primary: 85.8% train vs 61.93% test (23.8 pp gap). Legacy f1: 100% / 71.02% / 29 pp.", "N/A", "Markdown interpretation.", "Reduced but present overfit.", "Memorization reduced vs legacy tuning."),
                 ("7.3b", "Regularization comparison (audit)", "Constrained RF configs",
                  "Shallower trees / larger leaves reduce gap at accuracy cost.", "N/A", "Trade-off table.", "No config reaches AUC 0.7.", "Stricter trees generalize better but score lower."),
                 ("7.3c", "Class-0 recall (audit)", "Confusion matrix narrative",
@@ -394,7 +404,9 @@ def section_processes():
             "simple": "We compared predictions with groups to see if both analyses agree.",
             "processes": [
                 ("8.1", "Importance vs differentiation", "Rank comparison",
-                 "RF rank vs cluster mean-range rank → synthesis_comparison.png.", "N/A", "Convergence in top features.", "Mutual validation.", "Checked if predictors define groups."),
+                 "RF rank vs cluster mean-range rank → synthesis_comparison.png.", "N/A",
+                 "Top-5 overlap: CRP/ALB only; partial convergence.", "Different questions, related biology.",
+                 "Compared survival predictors vs phenotype separators."),
                 ("8.2", "Probability by cluster", "predict_proba",
                  "Mean predicted vs actual survival rate per cluster.", "tuned RF on full X", "Bridge table.", "Calibration across subgroups.", "Compared model confidence per group."),
                 ("8.3", "Clinical synthesis", "Dynamic narrative",

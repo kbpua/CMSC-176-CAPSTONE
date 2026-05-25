@@ -525,7 +525,7 @@ def build_slides() -> str:
     # 18 Survival overlay
     s.append(slide(18, "IV", "K-Means: Survival Overlay and Chi-Square",
         fig_left_slide("cluster_survival_overlay.png", "Survival rates per cluster with chi-square test",
-            '''<div class="banner warn">Chi-square p = 0.2546 &mdash; NOT significant at &alpha;=0.05<br>Cramer's V ~ 0.056 &mdash; negligible effect</div>''' +
+            '''<div class="banner warn">Chi-square p = 0.2546 &mdash; NOT significant at &alpha;=0.05<br>Cramer's V ~ 0.048 &mdash; negligible effect</div>''' +
             bullets([
                 "Cluster 0: 70.1%, Cluster 1: 69.6%, Cluster 2: 63.2%",
                 "Directional trend (Cluster 2 lowest) but not statistically conclusive",
@@ -623,7 +623,7 @@ def build_slides() -> str:
     # 24 Synthesis comparison
     s.append(slide(24, "VI", "Synthesis: Feature Importance vs Cluster Differentiation",
         fig_left_slide("synthesis_comparison.png", "RF importance vs cluster differentiation (top 10)",
-            '<div class="callout clinical hbox"><strong>Convergence</strong><p>CEA, Prealbumin, CA19-9, inflammatory markers &mdash; supervised and unsupervised analyses converge on the same clinical themes.</p></div>'
+            '<div class="callout clinical hbox"><strong>Partial convergence</strong><p>Only <strong>CRP/ALB</strong> appears in both top-5 lists. RF emphasizes tumor markers (CA19-9, CEA); clustering emphasizes inflammation and bilirubin (CRP, SII). Related clinical biology, different rankings.</p></div>'
         ), "Intellectual core &mdash; slow down."))
 
     # 25 Bridge table
@@ -649,9 +649,9 @@ def build_slides() -> str:
         ("2", "Lower-Risk Subgroup (Cluster 0)",
          "Highest observed survival at 70.1% with lower inflammation and higher prealbumin. "
          "Mean predicted probability is 70.4% — partial alignment between unsupervised and supervised views."),
-        ("3", "Convergence Across Both Analyses",
-         "Features ranking highly in RF importance and cluster differentiation overlap on tumor markers, "
-         "nutrition, and inflammation. Chi-square p = 0.2546: not significant, but directionally coherent."),
+        ("3", "Partial Convergence Across Both Analyses",
+         "Only CRP/ALB overlaps in both top-5 rankings (notebook Section 8.1). RF prioritizes tumor/nutrition markers; "
+         "clusters prioritize inflammation/hepatobiliary markers. Chi-square p = 0.2546: not significant, but probability bridge (Slide 25) shows directional alignment."),
     ], balanced=True), "Most important slide — read or paraphrase carefully."))
 
     s.append(slide(0, "VII", "Limitations, Future Work, Conclusion", '<p class="dlbl">PART VII</p>', divider=True))
@@ -700,7 +700,7 @@ def build_slides() -> str:
         ("2", "Unsupervised Learning",
          "K-Means k=3 identified three clinical phenotypes. Cluster 2 lowest survival (63.2%). Chi-square p = 0.2546."),
         ("3", "Synthesis",
-         "Supervised and unsupervised analyses converge on tumor markers, nutrition, and inflammation."),
+         "Complementary views: RF tumor/nutrition markers vs cluster inflammation markers; CRP/ALB is the explicit top-5 overlap."),
         ("4", "Key Takeaway",
          f"{CORE_FINDING} Staging and treatment data needed for clinical utility."),
     ], balanced=True), "60-second close. No new claims."))
@@ -738,7 +738,21 @@ def build_slides() -> str:
         table("Unsupervised benchmark (Section 6.0, k=3)", ["Method", "Chi-sq p", "Assignment", "Selected?"], [
             ["K-Means","0.2546","100%","Yes"],["GMM","0.5259","100%","Benchmark"],
             ["Ward (k=3)","0.6478","100%","Benchmark"],["DBSCAN","0.0090","~49%","Rejected"],
-        ]), "Quick-reference table; see A6–A7 for figures and A9 for RF tuning comparison."))
+        ]), "Quick-reference test and unsupervised tables. Overfitting gaps on A5b; see A6–A7 for figures and A9 for RF tuning."))
+
+    s.append(slide("A5b", "APP", "Appendix: Train-Test Overfitting (Section 7.5)",
+        '<p class="sub">Same train-test split (702/176), random_state=42 &mdash; from notebook Section 7.5</p>' +
+        table("Train-test overfitting (Section 7.5)", ["Model", "Train Acc", "Test Acc", "Overfit Gap"], [
+            ["RF (f1_macro tuned)","85.8%","61.9%","23.8 pp"],
+            ["SVM RBF","75.5%","61.9%","13.6 pp"],
+            ["Logistic Regression","65.0%","55.1%","9.8 pp"],
+            ["Gradient Boosting","98.3%","63.6%","34.7 pp"],
+        ]) + '<p class="fn">GB shows the largest gap (34.7 pp); LR generalizes best on this split.</p>' +
+        bullets([
+            "RF: 23.8 pp gap (down from 29 pp under legacy f1 tuning)",
+            "GB: highest test acc (63.6%) but worst overfit &mdash; not selected",
+            "All models: test accuracy near or below 68.8% majority baseline",
+        ]), "Use when panel asks about overfitting or why RF was kept despite lower test acc than GB."))
 
     s.append(slide("A6", "APP", "Appendix: Supervised Model Comparison (Section 7.5)", f'''
     <p class="sub">Same train-test split (702/176), random_state=42 &mdash; from notebook Section 7.5</p>

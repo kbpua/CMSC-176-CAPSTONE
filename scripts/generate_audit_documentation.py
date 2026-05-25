@@ -565,8 +565,8 @@ def build_story():
     limits = [
         "Moderate class imbalance (2.2:1) despite balanced weights; low class-0 recall persists.",
         "Weak univariate correlations (all |r| < 0.15) — prediction requires multivariate interactions.",
-        "Severe RF overfitting: 100% train vs 71% test accuracy with tuned hyperparameters.",
-        "AUC 0.613 — limited discrimination; no model in comparison exceeds AUC 0.63.",
+        "Primary RF overfitting persists: 85.8% train vs 61.9% test (23.8 pp gap) after f1_macro tuning.",
+        "Primary AUC 0.563 — limited discrimination; no model in comparison exceeds AUC 0.63.",
         "Cluster–survival association not significant (p = 0.2546; Cramér's V ≈ 0.048).",
         "K-Means assumes spherical, equal-variance clusters; geometry may differ in reality.",
         "Multicollinearity among NLR, PLR, SII, CRP/ALB and component labs.",

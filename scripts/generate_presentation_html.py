@@ -223,18 +223,18 @@ def build_slides() -> str:
 
     # 3 Problem
     s.append(slide(3, "I", "Problem Statement and Clinical Background", '''
-    <div class="lr-layout">
+    <div class="lr-layout problem-layout">
       <div class="lr-left">
-        <p>Pancreatic cancer remains one of the most lethal malignancies. Preoperative risk stratification helps surgical teams, patients, and families plan treatment intensity and supportive care.</p>
-        ''' + bullets([
-            "Low overall survival compared with many other cancers",
-            "Routine preoperative labs and tumor markers collected before surgery",
-            "Can these features predict 1-year survival and reveal patient subgroups?",
-        ]) + '''
+        <p class="problem-lead">Pancreatic cancer remains one of the most lethal malignancies. Preoperative risk stratification helps surgical teams, patients, and families plan treatment intensity and supportive care.</p>
+        <ul class="problem-list">
+          <li><span class="pli-n">1</span><span>Low overall survival compared with many other cancers</span></li>
+          <li><span class="pli-n">2</span><span>Routine preoperative labs and tumor markers collected before surgery</span></li>
+          <li><span class="pli-n">3</span><span>Can these features predict 1-year survival and reveal patient subgroups?</span></li>
+        </ul>
       </div>
       <div class="lr-right">
-        <div class="callout clinical hbox">
-          <strong>Research question</strong>
+        <div class="problem-rq">
+          <span class="problem-rq-tag">Research Question</span>
           <p>Can routine preoperative blood tests and tumor markers predict 1-year survival in pancreatic cancer patients &mdash; and do the same features define clinically meaningful subgroups?</p>
         </div>
       </div>
@@ -718,6 +718,21 @@ html,body{height:100%;overflow:hidden;font-family:'Poppins',sans-serif;backgroun
 /* --- Two-panel layout: figure left, content right --- */
 .lr-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:stretch;flex:1}
 .lr-left,.lr-right{min-width:0;display:flex;flex-direction:column}
+
+/* --- Problem statement slide --- */
+.slide[data-slide="3"] .st{margin-bottom:.55rem;padding-bottom:.38rem}
+.slide[data-slide="3"] .sb{padding-top:.15rem}
+.problem-layout{grid-template-columns:1.12fr .88fr;gap:1.75rem;align-items:flex-start;align-content:flex-start}
+.problem-layout .lr-left{justify-content:flex-start;gap:.5rem}
+.problem-layout .lr-right{justify-content:flex-start}
+.problem-lead{font-size:1.05rem;line-height:1.7;color:var(--tx);margin:0 0 1rem 0}
+.problem-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.65rem}
+.problem-list li{display:flex;gap:.85rem;align-items:flex-start;background:var(--bp);border-left:4px solid var(--blue);padding:.88rem 1.05rem;border-radius:0 8px 8px 0}
+.problem-list .pli-n{display:flex;align-items:center;justify-content:center;min-width:2rem;height:2rem;background:var(--navy);color:#fff;border-radius:50%;font-size:.82rem;font-weight:700;flex-shrink:0}
+.problem-list li span:last-child{font-size:.98rem;line-height:1.55;color:var(--tx);flex:1;padding-top:.2rem}
+.problem-rq{background:var(--navy);color:#fff;border-radius:10px;padding:1.35rem 1.4rem;border-left:5px solid var(--blue);display:flex;flex-direction:column;gap:.55rem}
+.problem-rq-tag{font-size:.74rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#93c5fd}
+.problem-rq p{font-size:1.05rem;line-height:1.65;margin:0;color:#f1f5f9}
 
 /* --- Figures --- */
 .fig-wrap{margin-bottom:.5rem;flex:1;display:flex;flex-direction:column}

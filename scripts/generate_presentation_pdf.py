@@ -150,6 +150,97 @@ html, body {{
   gap: 12px !important;
 }}
 
+/* Problem statement slide */
+.slide[data-slide="3"] .st {{
+  margin-bottom: 16px !important;
+  padding-bottom: 10px !important;
+}}
+.slide[data-slide="3"] .sb {{
+  padding-top: 6px !important;
+}}
+.problem-layout {{
+  grid-template-columns: 1.12fr 0.88fr !important;
+  gap: 36px !important;
+  align-items: flex-start !important;
+  align-content: flex-start !important;
+}}
+.problem-layout .lr-left {{
+  justify-content: flex-start !important;
+  gap: 12px !important;
+}}
+.problem-layout .lr-right {{
+  justify-content: flex-start !important;
+}}
+.problem-lead {{
+  font-size: 30px !important;
+  line-height: 1.55 !important;
+  color: var(--tx) !important;
+  margin: 0 0 20px 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}}
+.problem-list {{
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}}
+.problem-list li {{
+  display: flex !important;
+  gap: 18px !important;
+  align-items: flex-start !important;
+  background: var(--bp) !important;
+  border-left: 5px solid var(--blue) !important;
+  padding: 18px 22px !important;
+  border-radius: 0 10px 10px 0 !important;
+  flex: 0 0 auto !important;
+}}
+.problem-list .pli-n {{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  background: var(--navy) !important;
+  color: #fff !important;
+  border-radius: 50% !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  flex-shrink: 0 !important;
+}}
+.problem-list li span:last-child {{
+  font-size: 28px !important;
+  line-height: 1.45 !important;
+  flex: 1 !important;
+  padding-top: 4px !important;
+}}
+.problem-rq {{
+  background: var(--navy) !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  padding: 28px 30px !important;
+  border-left: 6px solid var(--blue) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  flex: 0 0 auto !important;
+}}
+.problem-rq-tag {{
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #93c5fd !important;
+}}
+.problem-rq p {{
+  font-size: 30px !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+  color: #f1f5f9 !important;
+}}
+
 /* Figures */
 .fig-wrap {{
   flex: 0 0 auto !important;

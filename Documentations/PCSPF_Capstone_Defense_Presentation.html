@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>PCSPF Capstone Defense Presentation</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+:root{--navy:#1E3A5F;--blue:#2563EB;--bl:#DBEAFE;--bp:#EFF6FF;--bd:#BFDBFE;--tx:#1E293B;--mt:#64748B}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'Poppins',sans-serif;background:#0f172a;color:var(--tx)}
+#deck{height:100vh}
+
+/* --- Slide shell --- */
+.slide{display:none;width:100vw;height:100vh;overflow-y:auto;background:#fff;padding:1.4rem 2.8rem 3.4rem;flex-direction:column}
+.slide.active{display:flex}
+.si{max-width:1140px;margin:0 auto;position:relative;width:100%;flex:1;display:flex;flex-direction:column}
+.snum{position:absolute;top:0;right:0;font-size:.82rem;color:var(--mt);font-weight:600}
+.st{font-size:1.45rem;font-weight:700;color:var(--navy);border-bottom:2.5px solid var(--blue);padding-bottom:.4rem;margin-bottom:.8rem}
+.sb{font-size:.88rem;line-height:1.6;flex:1;display:flex;flex-direction:column}
+.sb ul{margin:.4rem 0 .4rem 1.2rem}
+.sb li{margin-bottom:.3rem}
+.sb ol{margin:.4rem 0 .4rem 1.3rem}
+.sb ol li{margin-bottom:.3rem}
+.sb h3{font-size:.95rem;color:var(--navy);margin:.55rem 0 .25rem}
+.sb p{margin-bottom:.35rem}
+.sub{font-size:1rem;color:var(--mt);margin-bottom:.6rem}
+.team{color:var(--blue);font-weight:600;font-size:1.05rem}
+.muted{color:var(--mt);font-size:.82rem}
+.fn{font-size:.72rem;color:var(--mt);margin-top:.25rem}
+
+/* --- Hero slides (title + section dividers) --- */
+.hero-slide{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 40%,#1e40af 100%);padding:0;overflow:hidden;color:#fff}
+.hero-slide .si{max-width:100%;padding:0;justify-content:center;align-items:center;position:relative}
+.hero-slide .snum{display:none}
+.hero-slide .st{display:none}
+.hero-inner{position:relative;z-index:2;text-align:center;max-width:840px;padding:2rem}
+.hero-label{display:inline-block;background:rgba(37,99,235,.25);border:1px solid rgba(96,165,250,.4);color:#93c5fd;font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:.35rem 1.1rem;border-radius:40px;margin-bottom:1.4rem}
+.hero-inner h1{font-size:2.3rem;font-weight:700;color:#fff;line-height:1.25;margin-bottom:.6rem;letter-spacing:-.01em}
+.section-inner h1{font-size:2rem}
+.hero-accent-bar{width:80px;height:3px;background:linear-gradient(90deg,#60a5fa,#a78bfa);margin:0 auto 1rem;border-radius:2px}
+.hero-sub{font-size:1.05rem;font-weight:400;color:rgba(191,219,254,.9);margin-bottom:2.4rem;letter-spacing:.02em}
+.hero-info{display:flex;flex-direction:column;align-items:center;gap:.3rem;margin-bottom:1.8rem}
+.hero-info p{margin:0;font-size:.88rem;color:rgba(203,213,225,.85);font-weight:400}
+.hero-info .info-bold{color:#e2e8f0;font-weight:500}
+.hero-members{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin-top:.4rem}
+.hero-members .member{text-align:center}
+.hero-members .member-name{font-size:.92rem;font-weight:600;color:#fff;letter-spacing:.01em}
+.hero-footer{margin-top:1.5rem;font-size:.82rem;color:rgba(203,213,225,.85)}
+.thank-hero .hero-inner h1{font-size:3.2rem}
+.thank-hero .hero-sub{margin-bottom:2rem}
+.hero-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;pointer-events:none}
+.hero-orb.orb1{width:420px;height:420px;background:#3b82f6;top:-120px;right:-80px}
+.hero-orb.orb2{width:300px;height:300px;background:#8b5cf6;bottom:-100px;left:-60px}
+.hero-orb.orb3{width:200px;height:200px;background:#06b6d4;bottom:60px;right:120px;opacity:.1}
+
+/* --- Two-panel layout: figure left, content right --- */
+.lr-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:stretch;flex:1}
+.lr-left,.lr-right{min-width:0;display:flex;flex-direction:column}
+
+/* --- Figures --- */
+.fig-wrap{margin-bottom:.5rem;flex:1;display:flex;flex-direction:column}
+.fig-label{font-size:.8rem;font-weight:600;color:var(--navy);margin-bottom:.25rem}
+.fig-wrap img{max-width:100%;max-height:420px;height:auto;object-fit:contain;display:block;border:1px solid var(--bd);border-radius:4px;flex:1;min-height:0}
+.fig-cap{font-size:.68rem;color:var(--mt);font-style:italic;margin-top:.2rem}
+.full-fig{max-width:100%;max-height:440px;object-fit:contain;display:block;margin:0 auto;border:1px solid var(--bd);border-radius:4px}
+.dual-fig{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-bottom:.5rem}
+.dual-fig .fig-wrap img{max-height:300px}
+
+/* --- Tables --- */
+.tbl-label{font-size:.8rem;font-weight:600;color:var(--navy);margin-bottom:.2rem}
+.dt{width:100%;border-collapse:collapse;font-size:.78rem;margin-bottom:.5rem}
+.dt th{background:var(--navy);color:#fff;padding:.35rem .5rem;text-align:left}
+.dt td{border:1px solid var(--bd);padding:.3rem .5rem;vertical-align:top}
+.dt tr:nth-child(even) td{background:var(--bp)}
+
+/* --- Callouts --- */
+.callout{border-radius:6px;padding:.55rem .75rem;margin:.4rem 0;font-size:.8rem;border:1px solid var(--bd)}
+.callout strong{display:block;margin-bottom:.15rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.03em}
+.callout.stat{background:var(--bp)}
+.callout.clinical{background:#f0fdf4;border-color:#86efac}
+.callout.clinical strong{color:#166534}
+.callout.defense{background:#fefce8;border-color:#fde047}
+.callout.defense strong{color:#854d0e}
+.callout.warn{background:#fff7ed;border-color:#fdba74}
+.callout.warn strong{color:#9a3412}
+.hbox{text-align:center}
+
+/* --- Banners --- */
+.banner{background:var(--navy);color:#fff;padding:.5rem .8rem;border-radius:6px;font-size:.82rem;text-align:center;margin-bottom:.6rem}
+.banner.warn{background:#9a3412}
+.banner.info{background:var(--blue)}
+
+/* --- Vertical list (roadmap, objectives, checks) --- */
+.vt-list{display:flex;flex-direction:column;gap:.65rem;flex:1;min-height:0;justify-content:flex-start}
+.vt-list.balanced{justify-content:space-evenly;gap:.75rem}
+.vt-list.balanced .vt-item{padding:1rem 1.1rem}
+.vt-list.balanced .vt-item strong{font-size:1.05rem}
+.vt-list.balanced .vt-item p{font-size:.95rem}
+.vt-item{display:flex;gap:.85rem;align-items:flex-start;background:var(--bp);border-left:4px solid var(--blue);padding:.85rem 1rem;border-radius:0 8px 8px 0}
+.vt-num{display:flex;align-items:center;justify-content:center;min-width:2.2rem;height:2.2rem;background:var(--navy);color:#fff;border-radius:50%;font-size:.88rem;font-weight:700;flex-shrink:0;margin-top:.05rem}
+.vt-item strong{display:block;color:var(--navy);font-size:1rem;margin-bottom:.25rem}
+.vt-item p{font-size:.92rem;line-height:1.5;margin:0;color:var(--tx)}
+.vt-list.compact{gap:.55rem;justify-content:space-evenly}
+.vt-list.compact .vt-item{padding:.72rem .95rem}
+.vt-list.compact .vt-item strong{font-size:1rem}
+.vt-list.compact .vt-item p{font-size:.94rem;line-height:1.42}
+.vt-list.compact .vt-num{min-width:2.1rem;height:2.1rem;font-size:.82rem}
+
+/* --- Figure slides: image left, all text right --- */
+.fig-slide .lr-left{justify-content:center;align-items:center}
+.fig-slide .lr-left .fig-wrap{width:100%;height:100%;justify-content:center}
+.fig-slide.dense-slide .lr-layout{align-items:stretch;flex:1;min-height:0}
+.fig-slide.dense-slide .fig-wrap img{max-height:500px;min-height:320px}
+.fig-right{display:flex;flex-direction:column;gap:.65rem;min-height:0;flex:1;justify-content:space-evenly}
+.fig-right.dense{gap:.55rem;justify-content:space-evenly}
+.fig-right.dense .banner{font-size:.95rem;padding:.55rem .75rem;margin:.3rem 0;line-height:1.42}
+.fig-right.dense .dt{font-size:.82rem;margin-bottom:.35rem}
+.fig-right.dense .dt th,.fig-right.dense .dt td{padding:.32rem .45rem;font-size:.82rem;line-height:1.35}
+.fig-right.dense .tbl-label{font-size:.9rem;margin-bottom:.15rem}
+.fig-right.dense .callout.compact{padding:.55rem .72rem;font-size:.92rem;line-height:1.42}
+.fig-right.dense .callout.compact p{font-size:.92rem}
+.fig-right.dense .callout.compact strong{font-size:.78rem}
+.fig-right ul{margin:.4rem 0 .4rem 1.3rem}
+.fig-right li{margin-bottom:.45rem;font-size:.95rem;line-height:1.5}
+.fig-right h3{font-size:1rem;color:var(--navy);margin:.2rem 0}
+.fig-right p{font-size:.95rem}
+.fig-right .banner{margin:.35rem 0;font-size:.92rem;padding:.55rem .75rem;line-height:1.45}
+.fig-label{font-size:.92rem}
+.callout.compact{padding:.6rem .8rem;margin:.3rem 0;font-size:.92rem;line-height:1.5}
+.callout.compact strong{font-size:.82rem;margin-bottom:.15rem;letter-spacing:.03em}
+.callout.compact p{font-size:.92rem;margin:0}
+
+/* --- Roadmap (legacy) --- */
+.roadmap{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin:.8rem 0}
+.ri{background:var(--bp);border:1px solid var(--bd);border-radius:6px;padding:.6rem .7rem;font-size:.85rem;font-weight:500}
+.ri span{display:inline-block;background:var(--navy);color:#fff;border-radius:3px;padding:.08rem .4rem;margin-right:.35rem;font-size:.72rem}
+
+/* --- Objectives --- */
+.obj-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:.5rem}
+.obj{background:var(--bp);border-left:3px solid var(--blue);padding:.75rem;border-radius:0 6px 6px 0;display:flex;flex-direction:column;justify-content:center}
+.obj h3{font-size:.88rem;color:var(--navy);margin-bottom:.2rem}
+.on{display:inline-block;background:var(--blue);color:#fff;width:1.5rem;height:1.5rem;border-radius:50%;text-align:center;line-height:1.5rem;font-size:.75rem;margin-bottom:.25rem}
+
+/* --- Flow diagrams --- */
+.flow-v{display:flex;flex-direction:column;align-items:center;gap:.3rem;margin-bottom:.6rem}
+.flow-h{display:flex;align-items:center;justify-content:center;gap:.45rem;flex-wrap:wrap;margin:.45rem 0}
+.fb{background:var(--bp);border:1px solid var(--bd);padding:.45rem .75rem;border-radius:6px;font-weight:600;font-size:.8rem;text-align:center}
+.fb.accent{background:var(--bl);border-color:var(--blue)}
+.fa{font-size:1.1rem;color:var(--blue);font-weight:700}
+
+/* --- Checklist --- */
+.check-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.5rem}
+.ci{display:flex;gap:.6rem;align-items:flex-start;background:var(--bp);padding:.6rem;border-radius:6px;border:1px solid var(--bd)}
+.ci strong{font-size:.85rem}
+.ci p{font-size:.82rem}
+.ck{color:#16a34a;font-size:1.1rem;font-weight:700}
+
+/* --- Cluster cards --- */
+.cluster-cards{display:flex;gap:.6rem;margin:.45rem 0}
+.cc{padding:.55rem .7rem;border-radius:6px;font-size:.8rem;border:1px solid var(--bd);flex:1}
+.cc.c0{background:#ecfdf5}.cc.c1{background:#fef9c3}.cc.c2{background:#fee2e2}
+
+/* --- Transparency --- */
+.transp{background:#f8fafc;padding:.9rem;border-radius:6px;border:1px solid var(--bd)}
+.transp ul{font-size:.88rem}
+.transp li{margin-bottom:.4rem}
+
+/* --- Pull quote --- */
+.pq{border-left:4px solid var(--blue);padding:.8rem 1rem;background:var(--bp);font-size:.88rem;line-height:1.6;flex:1}
+.pq p{margin-bottom:.55rem}
+
+/* --- Conclusion --- */
+.conc-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:.5rem}
+.conc{background:var(--bp);border-top:3px solid var(--blue);padding:.75rem;border-radius:0 0 6px 6px;display:flex;flex-direction:column;justify-content:center}
+.conc h3{color:var(--navy);font-size:.88rem;margin-bottom:.25rem}
+.conc p{font-size:.85rem}
+
+/* --- Future work --- */
+.fw-list{columns:2;column-gap:1.8rem;margin-left:1.2rem;font-size:.88rem}
+.fw-list li{margin-bottom:.45rem}
+
+/* --- Thank you --- */
+.ty{text-align:center;padding-top:0;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.ty h1{font-size:2.8rem;color:var(--navy);margin-bottom:.4rem}
+.ty .sub{font-size:1.15rem}
+.ty .team{font-size:1.1rem}
+
+/* --- Speaker notes --- */
+.snotes{display:none;margin-top:.6rem;padding:.5rem .65rem;background:#f1f5f9;border-left:3px solid var(--mt);font-size:.72rem;color:var(--mt)}
+body.show-notes .snotes{display:block}
+.hero-slide .snotes{background:rgba(15,23,42,.55);color:rgba(226,232,240,.85);border-left-color:#60a5fa}
+
+/* --- Controls --- */
+#ctl{position:fixed;bottom:0;left:0;right:0;height:42px;background:rgba(30,58,95,.95);display:flex;align-items:center;justify-content:space-between;padding:0 1.2rem;z-index:100;color:#fff}
+#ctl button{background:var(--blue);color:#fff;border:none;padding:.3rem .75rem;border-radius:5px;font-family:inherit;font-weight:600;cursor:pointer;font-size:.78rem}
+#ctl button:hover{background:#1d4ed8}
+#prog{font-size:.78rem;font-weight:500}
+#hint{font-size:.65rem;opacity:.8}
+
+@media print{html,body{overflow:visible}.slide{display:block!important;page-break-after:always;height:auto;min-height:100vh}#ctl{display:none}}
+</style></head><body>
+<div id="deck">
+<section class="slide hero-slide title-hero" data-slide="1" data-part="Front">
+  <div class="si">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
+    <div class="hero-inner">
+      <span class="hero-label">Capstone Defense &middot; CMSC 176</span>
+      <h1>Pancreatic Cancer Survival Prediction Based on Preoperative Clinical Features</h1>
+      <div class="hero-accent-bar"></div>
+      <p class="hero-sub">Supervised and Unsupervised Learning Approaches</p>
+      <div class="hero-info">
+        <p class="info-bold">Fundamentals of Data Science</p>
+        <p>University of the Philippines Manila</p>
+      </div>
+      <div class="hero-members">
+        <div class="member"><p class="member-name">Alysa Mariel G. Jayme</p></div>
+        <div class="member"><p class="member-name">Kurt Benedict Wilbur B. Pua</p></div>
+        <div class="member"><p class="member-name">Louis Conrad Andrei S. Tinio</p></div>
+      </div>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Introduce team in 30 seconds.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="2" data-part="Front">
+  <div class="si">
+    <span class="snum">2</span>
+    <h2 class="st">Presentation Roadmap</h2>
+    <div class="sb"><div class="vt-list compact"><div class="vt-item"><span class="vt-num">I</span><div><strong>Problem &amp; Objectives</strong><p>Clinical background, research question, and four project goals</p></div></div><div class="vt-item"><span class="vt-num">II</span><div><strong>Dataset &amp; EDA</strong><p>PCSPF cohort (n=878), target imbalance, distributions, and correlations</p></div></div><div class="vt-item"><span class="vt-num">III</span><div><strong>Preprocessing</strong><p>Data quality, outliers, VIF, scaling, and train-test split decisions</p></div></div><div class="vt-item"><span class="vt-num">IV</span><div><strong>K-Means Clustering</strong><p>Cluster selection (k=3), PCA visualization, profiles, and survival overlay</p></div></div><div class="vt-item"><span class="vt-num">V</span><div><strong>Random Forest</strong><p>Model tuning, test performance, ROC/AUC, and feature importance</p></div></div><div class="vt-item"><span class="vt-num">VI</span><div><strong>Synthesis</strong><p>Bridging supervised predictions with unsupervised cluster structure</p></div></div><div class="vt-item"><span class="vt-num">VII</span><div><strong>Limitations &amp; Conclusion</strong><p>Honest limitations, future work, and key takeaways</p></div></div></div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Walk structure in 45 seconds.</aside>
+  </div>
+</section>
+
+<section class="slide hero-slide section-hero" data-slide="I" data-part="I">
+  <div class="si">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
+    <div class="hero-inner section-inner">
+      <span class="hero-label">PART I</span>
+      <h1>Problem Context and Objectives</h1>
+      <div class="hero-accent-bar"></div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="slide" data-slide="3" data-part="I">
+  <div class="si">
+    <span class="snum">3</span>
+    <h2 class="st">Problem Statement and Clinical Background</h2>
+    <div class="sb">
+    <div class="lr-layout">
+      <div class="lr-left">
+        <p>Pancreatic cancer remains one of the most lethal malignancies. Preoperative risk stratification helps surgical teams, patients, and families plan treatment intensity and supportive care.</p>
+        <ul><li>Low overall survival compared with many other cancers</li><li>Routine preoperative labs and tumor markers collected before surgery</li><li>Can these features predict 1-year survival and reveal patient subgroups?</li></ul>
+      </div>
+      <div class="lr-right">
+        <div class="callout clinical hbox">
+          <strong>Research question</strong>
+          <p>Can routine preoperative blood tests and tumor markers predict 1-year survival in pancreatic cancer patients &mdash; and do the same features define clinically meaningful subgroups?</p>
+        </div>
+      </div>
+    </div>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Emphasize clinical motivation. Do not overclaim deployment.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="4" data-part="I">
+  <div class="si">
+    <span class="snum">4</span>
+    <h2 class="st">Project Objectives</h2>
+    <div class="sb"><div class="vt-list"><div class="vt-item"><span class="vt-num">1</span><div><strong>Supervised Learning</strong><p>Train a tuned Random Forest to classify 1-year survival (survived &gt;=1 yr vs died &lt;1 yr) from 20 preoperative features. Report accuracy, macro F1, AUC-ROC, and per-class recall.</p></div></div><div class="vt-item"><span class="vt-num">2</span><div><strong>Unsupervised Learning</strong><p>Apply K-Means (k=3) on scaled features to identify preoperative patient phenotypes. Profile clusters clinically and test survival association post hoc (chi-square).</p></div></div><div class="vt-item"><span class="vt-num">3</span><div><strong>Synthesis</strong><p>Compare Gini feature importance with cluster-differentiating features. Bridge RF predicted probabilities across clusters to assess directional alignment.</p></div></div><div class="vt-item"><span class="vt-num">4</span><div><strong>Reproducible Pipeline</strong><p>Document every preprocessing choice and deliberate non-action (no SMOTE, no outlier removal, no transform). Use random_state=42 for split, tuning, and clustering reproducibility.</p></div></div></div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Map each objective to later slides.</aside>
+  </div>
+</section>
+
+<section class="slide hero-slide section-hero" data-slide="II" data-part="II">
+  <div class="si">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
+    <div class="hero-inner section-inner">
+      <span class="hero-label">PART II</span>
+      <h1>Dataset and Exploration</h1>
+      <div class="hero-accent-bar"></div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="slide" data-slide="5" data-part="II">
+  <div class="si">
+    <span class="snum">5</span>
+    <h2 class="st">Dataset Overview</h2>
+    <div class="sb">
+    <div class="lr-layout">
+      <div class="lr-left">
+        <p class="tbl-label">Table 1. Dataset Summary</p><table class="dt"><thead><tr><th>Item</th><th>Detail</th></tr></thead><tbody><tr><td>Source</td><td>PCSPF Pancreatic Cancer Survival (Preoperative Features)</td></tr><tr><td>Patients</td><td>878</td></tr><tr><td>Raw columns</td><td>24</td></tr><tr><td>After cleaning</td><td>21 (20 features + target)</td></tr><tr><td>Binary features</td><td>2 (Sex, Abdominal Pain)</td></tr><tr><td>Continuous features</td><td>18 (z-scored in released file)</td></tr><tr><td>Target</td><td>survival_label: 1 = survived &gt;=1 yr; 0 = died &lt;1 yr</td></tr><tr><td>Dropped</td><td>ID, Predict label 1, Predict label 0 (100% NaN)</td></tr></tbody></table>
+      </div>
+      <div class="lr-right">
+        <div class="flow-v">
+          <div class="fb">24 columns</div><div class="fa">&darr;</div>
+          <div class="fb accent">Drop 3 unusable</div><div class="fa">&darr;</div>
+          <div class="fb">21 columns (20 + target)</div>
+        </div>
+        <div class="callout clinical"><strong>Clinical note</strong><p>Surgical cohort with complete preoperative labs. Released continuous values are pre-standardized (z-scores).</p></div>
+      </div>
+    </div>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Mention z-score scale if asked about raw units.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="6" data-part="II">
+  <div class="si">
+    <span class="snum">6</span>
+    <h2 class="st">Target Distribution and Class Imbalance</h2>
+    <div class="sb"><div class="lr-layout fig-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 1. Target distribution (Class 0 vs Class 1)</p>
+      <img src="../figures/target_distribution.png" alt="Target distribution (Class 0 vs Class 1)" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 3.2</p>
+    </div></div>
+      <div class="lr-right fig-right">
+        <ul><li>Class 1 (survived &ge;1 yr): 604 patients (68.8%)</li><li>Class 0 (died &lt;1 yr): 274 patients (31.2%)</li><li>Imbalance ratio 2.20:1 &mdash; moderate, not severe</li><li>Majority baseline = 68.8%; mitigation: class_weight='balanced'</li></ul><div class="banner warn">Must beat 68.8% baseline and detect high-risk patients</div>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>Moderate class imbalance (2.20:1). A majority-class classifier predicting &#x27;survived&#x27; for everyone scores 68.8% accuracy without learning anything.</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>In this cohort, roughly 7 in 10 pancreatic cancer patients survived at least one year after surgery, while about 3 in 10 did not. That reflects both the severity of pancreatic cancer and the fact that surgical candidates are often selected patients - not the general population incidence of early mortality.</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Explain why accuracy alone is misleading. Class-0 recall is the clinical priority.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="7" data-part="II">
+  <div class="si">
+    <span class="snum">7</span>
+    <h2 class="st">EDA: Feature Distributions and Skewness</h2>
+    <div class="sb"><div class="lr-layout fig-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 2. Histograms + KDE for 18 continuous features</p>
+      <img src="../figures/feature_distributions.png" alt="Histograms + KDE for 18 continuous features" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 3.3</p>
+    </div></div>
+      <div class="lr-right fig-right">
+        <ul><li>Right-skewed: CA19-9, CRP, CEA, bilirubin (heavy clinical tails)</li><li>D'Agostino-Pearson: most features non-normal (p &lt; 0.05)</li><li>Decision: no Yeo-Johnson transform (RF rank-invariant; scaler for K-Means)</li></ul>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>Right-skewed distributions on CA19-9, CRP, CEA, and bilirubin. Released file values are already z-scored (mean~0, std&gt;=1).</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>Most tumor markers and inflammation labs have long right tails - a few patients with very high CA19-9, CRP, or bilirubin. Clinically, those extremes often reflect advanced obstructive jaundice, heavy tumor burden, or systemic inflammation rather than &#x27;bad data points.&#x27;</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Connect skewness to outlier retention on slide 11.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="8" data-part="II">
+  <div class="si">
+    <span class="snum">8</span>
+    <h2 class="st">EDA: Correlation Structure and Multicollinearity</h2>
+    <div class="sb"><div class="lr-layout fig-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 3. Pearson correlation matrix (20 features + target)</p>
+      <img src="../figures/correlation_heatmap.png" alt="Pearson correlation matrix (20 features + target)" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 3.5</p>
+    </div></div>
+      <div class="lr-right fig-right">
+        <ul><li>All feature-target |r| &lt; 0.15 &mdash; no strong linear predictor</li><li>Strong blocks: NLR, PLR, SII, CRP/ALB, bilirubin pairs</li><li>Implication: need interaction-capable model (RF)</li></ul>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>All feature-target |r| &lt; 0.15. Strong red blocks among NLR, PLR, SII, CRP/ALB, and bilirubin pairs.</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>No single preoperative lab linearly predicts 1-year survival strongly - survival is influenced by many factors acting together (tumor biology, nutrition, inflammation, biliary obstruction). The tight correlation blocks among NLR, PLR, SII, and CRP/ALB reflect one underlying clinical story: systemic inflammatory response in advanced disease.</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> This justifies RF over logistic regression.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="9" data-part="II">
+  <div class="si">
+    <span class="snum">9</span>
+    <h2 class="st">EDA: Class-Conditional Differences</h2>
+    <div class="sb"><div class="lr-layout fig-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 4. Top 10 mean differences by survival class</p>
+      <img src="../figures/class_conditional_means.png" alt="Top 10 mean differences by survival class" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 3.7</p>
+    </div></div>
+      <div class="lr-right fig-right">
+        <ul><li>Largest gaps: Abdominal Pain, CA19-9, Prealbumin, inflammatory markers</li><li>Boxplots show heavy overlap &mdash; weak univariate separation</li><li>Multivariate modeling still warranted</li></ul>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>Largest gaps: Abdominal Pain, CA19-9, Prealbumin, inflammatory markers. Differences are visible but modest.</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>Patients who died within a year reported more abdominal pain and had higher CA19-9 with lower prealbumin - a pattern consistent with symptomatic, nutritionally depleted, higher-burden disease at presentation. These are clinically recognizable risk signals even though none dominates alone.</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Reinforce weak signal theme.</aside>
+  </div>
+</section>
+
+<section class="slide hero-slide section-hero" data-slide="III" data-part="III">
+  <div class="si">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
+    <div class="hero-inner section-inner">
+      <span class="hero-label">PART III</span>
+      <h1>Preprocessing</h1>
+      <div class="hero-accent-bar"></div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="slide" data-slide="10" data-part="III">
+  <div class="si">
+    <span class="snum">10</span>
+    <h2 class="st">Preprocessing: Data Quality Checks</h2>
+    <div class="sb"><div class="vt-list"><div class="vt-item"><span class="vt-num">1</span><div><strong>Data Types Verified</strong><p>20 predictors + target after cleaning: 2 binary (Sex, Abdominal Pain) as integers; 18 continuous labs as float64. Confirmed before any modeling step.</p></div></div><div class="vt-item"><span class="vt-num">2</span><div><strong>Missing Values: None</strong><p>Zero nulls across all 878 rows and 21 columns. Verified with isnull().sum(), df.info(), and df.describe() -- no imputation required.</p></div></div><div class="vt-item"><span class="vt-num">3</span><div><strong>Duplicate Rows: None</strong><p>0 duplicate patient records detected. Each row represents one unique surgical case with complete preoperative feature set.</p></div></div><div class="vt-item"><span class="vt-num">4</span><div><strong>Imputation: Not Applied</strong><p>Because the released PCSPF file is complete, we did not introduce synthetic values. This preserves the original clinical cohort without imputation bias.</p></div></div></div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Speak slowly; professor audits preprocessing.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="11" data-part="III">
+  <div class="si">
+    <span class="snum">11</span>
+    <h2 class="st">Preprocessing: Outlier and Normality Assessment</h2>
+    <div class="sb"><div class="lr-layout fig-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 5. Per-feature z-score boxplots with IQR outliers</p>
+      <img src="../figures/outlier_boxplots.png" alt="Per-feature z-score boxplots with IQR outliers" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 4.4</p>
+    </div></div>
+      <div class="lr-right fig-right">
+        <p><strong>IQR rule (1.5&times;)</strong> on 18 continuous features</p><ul><li>Extreme values on CA19-9, CRP, CEA, bilirubin &mdash; retained</li><li>Clinically severe patients, not recording errors</li><li>Removing outliers would bias toward healthier cases</li><li>No normality transform applied (RF rank-invariant)</li></ul>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>Outliers concentrate on CA19-9, CRP, CEA, and bilirubin - extreme lab values, not data errors.</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>The flagged outliers are exactly the markers that spike in aggressive pancreatic cancer: markedly elevated CA19-9 or CEA, high CRP from inflammation, and bilirubin from biliary obstruction. These patients are often the most clinically complex - not statistical noise.</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Stress clinical validity of extreme labs. Defense: outliers carry prognostic signal.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="12" data-part="III">
+  <div class="si">
+    <span class="snum">12</span>
+    <h2 class="st">Preprocessing: Multicollinearity (VIF) and Feature Decisions</h2>
+    <div class="sb">
+    <div class="lr-layout">
+      <div class="lr-left">
+        <p class="tbl-label">Table 2. Top 8 VIF scores (all 20 in notebook Section 4.6)</p><table class="dt"><thead><tr><th>Feature</th><th>VIF</th><th>Level</th></tr></thead><tbody><tr><td>CRP/ALB</td><td>131.02</td><td>High</td></tr><tr><td>CRP</td><td>130.21</td><td>High</td></tr><tr><td>Dir. Bilirubin</td><td>77.61</td><td>High</td></tr><tr><td>Tot. Bilirubin</td><td>76.98</td><td>High</td></tr><tr><td>SII</td><td>18.30</td><td>High</td></tr><tr><td>NLR</td><td>12.38</td><td>High</td></tr><tr><td>PLR</td><td>8.21</td><td>Moderate</td></tr><tr><td>Neutrocyte</td><td>7.97</td><td>Moderate</td></tr></tbody></table>
+      </div>
+      <div class="lr-right">
+        <ul><li>Derived ratios (NLR, PLR, SII, CRP/ALB) correlate with components &mdash; expected</li><li>Decision: retain all 20 features (RF subsampling + clinical validity)</li><li>No new feature engineering; no pre-emptive feature drop</li></ul>
+        <div class="callout clinical"><strong>Defense</strong><p>NLR and PLR are standard preoperative indices &mdash; dropping them for VIF loses clinically validated markers.</p></div>
+      </div>
+    </div>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Prepare to explain why NLR not dropped despite VIF > 10.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="13" data-part="III">
+  <div class="si">
+    <span class="snum">13</span>
+    <h2 class="st">Preprocessing: Complete Decision Summary</h2>
+    <div class="sb">
+    <p class="fig-label">Figure 6. Preprocessing decision register (Section 4.10)</p>
+    <img class="full-fig" src="../figures/preprocessing_summary.png" alt="Preprocessing summary"/>
+    <p class="fig-cap">Source: PCSPF Capstone, n=878. Every row documents what we did and deliberately did not do.</p>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Professor anchor slide. Offer to expand any row in Q&A.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="14" data-part="III">
+  <div class="si">
+    <span class="snum">14</span>
+    <h2 class="st">Train-Test Split and Scaling Strategy</h2>
+    <div class="sb"><div class="lr-layout fig-slide dense-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 7. Feature distributions before/after StandardScaler</p>
+      <img src="../figures/scaling_before_after.png" alt="Feature distributions before/after StandardScaler" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 5.3</p>
+    </div></div>
+      <div class="lr-right fig-right dense">
+        <p class="tbl-label">Table 3. Split and scaling parameters</p><table class="dt"><thead><tr><th>Setting</th><th>Value</th></tr></thead><tbody><tr><td>Split</td><td>80/20 stratified</td></tr><tr><td>Train / test</td><td>702 / 176 patients</td></tr><tr><td>random_state</td><td>42</td></tr><tr><td>RF inputs</td><td>Unscaled X_train / X_test</td></tr><tr><td>K-Means inputs</td><td>StandardScaler on full X (878x20)</td></tr><tr><td>Class imbalance</td><td>class_weight=&#x27;balanced&#x27;</td></tr></tbody></table><div class="banner warn">Anti-leakage: label never used in scaling/clustering; RF trained on train set only.</div>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>Features already near z-score scale; StandardScaler enforces mean=0, std=1 for K-Means Euclidean distance.</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>Scaling puts all labs on equal footing for grouping patients - so BMI does not overpower CA19-9 just because of unit differences.</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Critical slide for data leakage questions.</aside>
+  </div>
+</section>
+
+<section class="slide hero-slide section-hero" data-slide="IV" data-part="IV">
+  <div class="si">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
+    <div class="hero-inner section-inner">
+      <span class="hero-label">PART IV</span>
+      <h1>Unsupervised Learning (K-Means)</h1>
+      <div class="hero-accent-bar"></div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="slide" data-slide="15" data-part="IV">
+  <div class="si">
+    <span class="snum">15</span>
+    <h2 class="st">K-Means: Cluster Selection (Elbow + Silhouette)</h2>
+    <div class="sb">
+    <div class="banner info">Survival label NOT used during clustering &mdash; only post-hoc overlay</div>
+    <div class="dual-fig"><div class="fig-wrap">
+      <p class="fig-label">Figure 8. Elbow method (inertia vs k)</p>
+      <img src="../figures/elbow_method.png" alt="Elbow method (inertia vs k)" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 6.1</p>
+    </div><div class="fig-wrap">
+      <p class="fig-label">Figure 9. Silhouette score vs k</p>
+      <img src="../figures/silhouette_scores.png" alt="Silhouette score vs k" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 6.2</p>
+    </div></div>
+    <ul><li>Silhouette max at k=2 (~0.206); k=3 (~0.133)</li><li>Elbow region k=2-4</li><li>Chosen k=3: three clinical phenotypes over pure silhouette optimum</li></ul></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Explain statistical vs clinical trade-off.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="16" data-part="IV">
+  <div class="si">
+    <span class="snum">16</span>
+    <h2 class="st">K-Means: Cluster Visualization (PCA)</h2>
+    <div class="sb"><div class="lr-layout fig-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 10. 2D PCA scatter colored by K-Means cluster</p>
+      <img src="../figures/pca_clusters.png" alt="2D PCA scatter colored by K-Means cluster" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 6.5</p>
+    </div></div>
+      <div class="lr-right fig-right">
+        <p class="tbl-label">Table 4. Cluster summary</p><table class="dt"><thead><tr><th>Cluster</th><th>N</th><th>% cohort</th><th>Survival rate</th></tr></thead><tbody><tr><td>0</td><td>519</td><td>59.1%</td><td>70.1%</td></tr><tr><td>1</td><td>204</td><td>23.2%</td><td>69.6%</td></tr><tr><td>2</td><td>155</td><td>17.7%</td><td>63.2%</td></tr></tbody></table><ul><li>PC1=20.3%, PC2=10.5% (cumulative 30.8%)</li><li>69.2% of variance not visible in 2D</li><li>Clustering in full 20D &mdash; PCA for visualization only</li></ul>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>Three partially separated groups. PC1+PC2 = 30.8% variance - 69.2% of structure not visible in 2D.</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>In two dimensions, three patient clouds appear with overlap - mirroring how preoperative risk is a spectrum, not discrete boxes. Clustering was done in full 20-feature space; this plot is a simplified map for presentation, like projecting a 3D tumor scan onto a slide.</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> PCA is not the clustering space.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="17" data-part="IV">
+  <div class="si">
+    <span class="snum">17</span>
+    <h2 class="st">K-Means: Cluster Clinical Profiles</h2>
+    <div class="sb"><div class="lr-layout fig-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 11. Z-scored mean features per cluster (heatmap)</p>
+      <img src="../figures/cluster_profiles_heatmap.png" alt="Z-scored mean features per cluster (heatmap)" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 6.6</p>
+    </div></div>
+      <div class="lr-right fig-right">
+        <div class="cluster-cards">
+              <div class="cc c0"><strong>Cluster 0</strong><br>Stable / Lower inflammation<br>Higher prealbumin &amp; albumin</div>
+              <div class="cc c1"><strong>Cluster 1</strong><br>Hepatobiliary burden<br>Elevated bilirubin, NLR, SII</div>
+              <div class="cc c2"><strong>Cluster 2</strong><br>High inflammation<br>High CRP, CRP/ALB, abdominal pain</div>
+            </div>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>Cluster 0: lower inflammation, higher prealbumin - &#x27;Stable/Low-Risk.&#x27; Cluster 1: elevated bilirubin, NLR, SII - &#x27;Hepatobiliary Burden.&#x27; Cluster 2: highest CRP, CRP/ALB, abdominal pain - &#x27;High-Inflammation.&#x27;</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>Cluster 0 looks like relatively well-nourished patients with less systemic inflammation - the profile you hope for before pancreatectomy. Cluster 1 resembles obstructive jaundice with elevated bilirubin and immune ratios.</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Clinical heart of unsupervised section.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="18" data-part="IV">
+  <div class="si">
+    <span class="snum">18</span>
+    <h2 class="st">K-Means: Survival Overlay and Chi-Square</h2>
+    <div class="sb"><div class="lr-layout fig-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 12. Survival rates per cluster with chi-square test</p>
+      <img src="../figures/cluster_survival_overlay.png" alt="Survival rates per cluster with chi-square test" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 6.7</p>
+    </div></div>
+      <div class="lr-right fig-right">
+        <div class="banner warn">Chi-square p = 0.2546 &mdash; NOT significant at &alpha;=0.05<br>Cramer's V ~ 0.056 &mdash; negligible effect</div><ul><li>Cluster 0: 70.1%, Cluster 1: 69.6%, Cluster 2: 63.2%</li><li>Directional trend (Cluster 2 lowest) but not statistically conclusive</li><li>Honest framing: coherent direction, not proof</li></ul>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>Cluster 2 directionally lowest survival but association NOT statistically significant. Negligible effect size.</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>High-inflammation Cluster 2 shows about 7 percentage points lower 1-year survival than Clusters 0 and 1 (63.2% vs ~70%) - the direction clinicians would expect - but the gap is not statistically confirmed. Preoperative labs alone cannot reliably stratify prognosis the way TNM staging can.</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Own the non-significance; professor respects honesty.</aside>
+  </div>
+</section>
+
+<section class="slide hero-slide section-hero" data-slide="V" data-part="V">
+  <div class="si">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
+    <div class="hero-inner section-inner">
+      <span class="hero-label">PART V</span>
+      <h1>Supervised Learning (Random Forest)</h1>
+      <div class="hero-accent-bar"></div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="slide" data-slide="19" data-part="V">
+  <div class="si">
+    <span class="snum">19</span>
+    <h2 class="st">Random Forest: Why RF, Setup, and Tuning</h2>
+    <div class="sb">
+    <div class="lr-layout">
+      <div class="lr-left">
+        <h3>Why Random Forest?</h3>
+        <ul><li>All |r| with target &lt; 0.15 &mdash; need nonlinear interactions</li><li>Built-in Gini importance for Section 8 synthesis</li><li>Robust to multicollinearity via random feature subsets</li><li>No scaling required (separate pipeline from K-Means)</li></ul>
+        <h3>Pipeline</h3>
+        <div class="flow-h">
+          <div class="fb">Baseline RF<br><small>100 trees / 68.18%</small></div>
+          <div class="fa">&rarr;</div>
+          <div class="fb accent">GridSearchCV<br><small>108 combos / 5-fold</small></div>
+          <div class="fa">&rarr;</div>
+          <div class="fb">Tuned RF<br><small>71.02% test</small></div>
+        </div>
+      </div>
+      <div class="lr-right">
+        <p class="tbl-label">Table 5. Best hyperparameters</p><table class="dt"><thead><tr><th>Hyperparameter</th><th>Value</th></tr></thead><tbody><tr><td>n_estimators</td><td>300</td></tr><tr><td>max_depth</td><td>15</td></tr><tr><td>min_samples_split</td><td>2</td></tr><tr><td>min_samples_leaf</td><td>1</td></tr><tr><td>class_weight</td><td>balanced</td></tr><tr><td>CV scoring</td><td>f1 (binary / class 1)</td></tr><tr><td>Best CV F1</td><td>~0.809</td></tr></tbody></table>
+        <p class="fn">* CV F1 optimizes positive-class F1, not macro F1 (see slide 23)</p>
+      </div>
+    </div>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Clarify CV F1 vs test macro F1 before slide 23.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="20" data-part="V">
+  <div class="si">
+    <span class="snum">20</span>
+    <h2 class="st">Random Forest: Test Set Performance</h2>
+    <div class="sb">
+    <div class="banner">Test acc: <strong>71.02%</strong> vs baseline <strong>68.8%</strong> (+2.27 pp) &middot; Macro F1: <strong>0.507</strong> &middot; Class-0 recall: <strong>10.9% (6/55)</strong></div>
+    <div class="dual-fig"><div class="fig-wrap">
+      <p class="fig-label">Figure 13. Confusion matrix (176-patient test set)</p>
+      <img src="../figures/confusion_matrix.png" alt="Confusion matrix (176-patient test set)" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 7.3</p>
+    </div><div class="fig-wrap">
+      <p class="fig-label">Figure 14. Per-class precision, recall, F1</p>
+      <img src="../figures/classification_report.png" alt="Per-class precision, recall, F1" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 7.3</p>
+    </div></div>
+    <div class="callout clinical"><strong>Clinical impact</strong><p>Model misses 49 of 55 high-risk patients. Research-grade, not clinic-ready &mdash; but better than baseline (0/55).</p></div>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Frame as modest improvement, not breakthrough.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="21" data-part="V">
+  <div class="si">
+    <span class="snum">21</span>
+    <h2 class="st">Random Forest: ROC Curve</h2>
+    <div class="sb"><div class="lr-layout fig-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 15. ROC curve with AUC = 0.613</p>
+      <img src="../figures/roc_curve.png" alt="ROC curve with AUC = 0.613" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 7.3</p>
+    </div></div>
+      <div class="lr-right fig-right">
+        <div class="banner">AUC = 0.613</div><ul><li>Above random (0.5) but below ~0.7 clinical utility</li><li>Reflects weak preoperative signal, not coding failure</li><li>All benchmark models also AUC &lt; 0.63</li></ul>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>Better than random but below ~0.7 threshold often cited for clinical utility.</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>AUC 0.613 means if you pick one patient who died within a year and one who survived, the model ranks the higher-risk patient higher about 61% of the time - better than a coin flip, but far from the ~0.70+ discrimination oncologists want for treatment decisions.</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Preempt 'is 0.613 good enough?'</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="22" data-part="V">
+  <div class="si">
+    <span class="snum">22</span>
+    <h2 class="st">Random Forest: Feature Importance</h2>
+    <div class="sb"><div class="lr-layout fig-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 16. All 20 Gini importances (top 5 highlighted)</p>
+      <img src="../figures/feature_importance.png" alt="All 20 Gini importances (top 5 highlighted)" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 7.4</p>
+    </div></div>
+      <div class="lr-right fig-right">
+        <h3>Top 5 (Gini)</h3><ul><li>CEA &mdash; tumor marker</li><li>Prealbumin &mdash; nutritional reserve (low = poor prognosis)</li><li>CA19-9 &mdash; classic pancreatic marker</li><li>Total Bilirubin &mdash; obstructive jaundice burden</li><li>BMI &mdash; body composition</li></ul>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>Importance spread across tumor markers, nutrition, and inflammation - no single dominant predictor.</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>CEA and CA19-9 - classic pancreatic tumor markers - rank highly, validating clinical intuition. Prealbumin reflects nutritional reserve; low prealbumin before surgery is a known poor prognostic sign.</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Tie back to EDA class-conditional findings.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="23" data-part="V">
+  <div class="si">
+    <span class="snum">23</span>
+    <h2 class="st">Performance Context (Honest Transparency)</h2>
+    <div class="sb">
+    <div class="transp">
+      <ul><li>Majority baseline = 68.8% &mdash; always report before tuned 71.02%</li><li>All feature-target |r| &lt; 0.15 &mdash; weak univariate signal</li><li>Missing staging, resectability, and treatment variables</li><li>Train accuracy 100% vs test 71% &mdash; 29 pp overfit gap documented</li><li>CV F1 ~0.809 uses binary F1 on class 1; test macro F1 = 0.507 averages both classes</li><li>Class-0 recall 10.9% despite class_weight='balanced'</li></ul>
+      <div class="callout clinical hbox"><strong>Core finding</strong><p>Preoperative features carry limited but real signal for pancreatic cancer survival prediction.</p></div>
+    </div>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Deliver confidently, not apologetically.</aside>
+  </div>
+</section>
+
+<section class="slide hero-slide section-hero" data-slide="VI" data-part="VI">
+  <div class="si">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
+    <div class="hero-inner section-inner">
+      <span class="hero-label">PART VI</span>
+      <h1>Synthesis and Bridging</h1>
+      <div class="hero-accent-bar"></div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="slide" data-slide="24" data-part="VI">
+  <div class="si">
+    <span class="snum">24</span>
+    <h2 class="st">Synthesis: Feature Importance vs Cluster Differentiation</h2>
+    <div class="sb"><div class="lr-layout fig-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 17. RF importance vs cluster differentiation (top 10)</p>
+      <img src="../figures/synthesis_comparison.png" alt="RF importance vs cluster differentiation (top 10)" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 8.1</p>
+    </div></div>
+      <div class="lr-right fig-right">
+        <div class="callout clinical hbox"><strong>Convergence</strong><p>CEA, Prealbumin, CA19-9, inflammatory markers &mdash; supervised and unsupervised analyses converge on the same clinical themes.</p></div>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>Overlap in CEA, Prealbumin, CA19-9, and inflammatory markers - supervised and unsupervised analyses converge.</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>Two independent methods - one predicting survival, one grouping similar patients - both highlight the same clinical themes: tumor burden (CEA, CA19-9), nutritional status (prealbumin), and systemic inflammation. That convergence is medically coherent even though neither method achieves strong standalone performance.</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Intellectual core &mdash; slow down.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="25" data-part="VI">
+  <div class="si">
+    <span class="snum">25</span>
+    <h2 class="st">Synthesis: Predicted Probability per Cluster</h2>
+    <div class="sb">
+    <p class="tbl-label">Table 6. Predicted survival probability per cluster</p><table class="dt"><thead><tr><th>Cluster</th><th>N</th><th>Actual survival %</th><th>Mean predicted %</th><th>Difference</th></tr></thead><tbody><tr><td>0</td><td>519</td><td>70.13</td><td>70.42</td><td>+0.29</td></tr><tr><td>1</td><td>204</td><td>69.61</td><td>67.29</td><td>-2.32</td></tr><tr><td>2</td><td>155</td><td>63.23</td><td>62.32</td><td>-0.91</td></tr></tbody></table><ul><li>Cluster 2: lowest actual and predicted &mdash; aligned ranking</li><li>Cluster 0: slightly over-confident (+0.29 pp)</li><li>Cluster 1: largest gap (-2.32 pp) &mdash; under-confident for hepatobiliary phenotype</li><li>Directional alignment despite modest AUC</li></ul>
+    <div class="callout clinical"><strong>Clinical reading</strong><p>Even a modest model ranks clusters coherently &mdash; high-inflammation Cluster 2 receives lowest predicted survival.</p></div>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Bridge supervised probabilities to unsupervised structure.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="26" data-part="VI">
+  <div class="si">
+    <span class="snum">26</span>
+    <h2 class="st">Synthesis: Clinical Narrative</h2>
+    <div class="sb"><div class="vt-list balanced"><div class="vt-item"><span class="vt-num">1</span><div><strong>High-Risk Subgroup (Cluster 2)</strong><p>Lowest 1-year survival at 63.2%. Profile dominated by elevated inflammatory and tumor-burden markers. Tuned RF assigns a lower mean predicted probability (62.3%).</p></div></div><div class="vt-item"><span class="vt-num">2</span><div><strong>Lower-Risk Subgroup (Cluster 0)</strong><p>Highest observed survival at 70.1% with lower inflammation and higher prealbumin. Mean predicted probability is 70.4% — partial alignment between unsupervised and supervised views.</p></div></div><div class="vt-item"><span class="vt-num">3</span><div><strong>Convergence Across Both Analyses</strong><p>Features ranking highly in RF importance and cluster differentiation overlap on tumor markers, nutrition, and inflammation. Chi-square p = 0.2546: not significant, but directionally coherent.</p></div></div></div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Most important slide — read or paraphrase carefully.</aside>
+  </div>
+</section>
+
+<section class="slide hero-slide section-hero" data-slide="VII" data-part="VII">
+  <div class="si">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
+    <div class="hero-inner section-inner">
+      <span class="hero-label">PART VII</span>
+      <h1>Limitations, Future Work, Conclusion</h1>
+      <div class="hero-accent-bar"></div>
+    </div>
+    
+  </div>
+</section>
+
+<section class="slide" data-slide="27" data-part="VII">
+  <div class="si">
+    <span class="snum">27</span>
+    <h2 class="st">Limitations</h2>
+    <div class="sb">
+    <div class="lr-layout">
+      <div class="lr-left">
+        <h3>Data</h3>
+        <ol><li>Moderate class imbalance (2.2:1) despite class_weight</li>
+        <li>Weak univariate correlations (all |r| &lt; 0.15)</li>
+        <li>Retrospective single-source; no external validation</li>
+        <li>Missing staging, surgery, treatment variables</li>
+        <li>Pre-standardized labs &mdash; raw units not in file</li></ol>
+      </div>
+      <div class="lr-right">
+        <h3>Model &amp; Analysis</h3>
+        <ol start="6"><li>Severe RF overfit (100% train vs 71% test)</li>
+        <li>Low class-0 recall (10.9%) &mdash; clinically insufficient alone</li>
+        <li>K-Means assumes spherical, equal-variance clusters</li>
+        <li>Multicollinearity may affect ratio-feature interpretation</li>
+        <li>Cluster-survival association not significant (p=0.2546)</li>
+        <li>PCA 2D captures only 30.8% of variance</li></ol>
+      </div>
+    </div>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Show scientific maturity. Invite questions.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="28" data-part="VII">
+  <div class="si">
+    <span class="snum">28</span>
+    <h2 class="st">Future Work</h2>
+    <div class="sb"><div class="vt-list compact"><div class="vt-item"><span class="vt-num">1</span><div><strong>Model Benchmarking</strong><p>Compare XGBoost/SVM; deploy best model with SHAP explanations.</p></div></div><div class="vt-item"><span class="vt-num">2</span><div><strong>Alternative Clustering</strong><p>Evaluate DBSCAN and hierarchical methods with survival validation.</p></div></div><div class="vt-item"><span class="vt-num">3</span><div><strong>Feature Transformations</strong><p>Apply Yeo-Johnson before K-Means to reduce skewness effects.</p></div></div><div class="vt-item"><span class="vt-num">4</span><div><strong>Feature Selection</strong><p>Use RFE or LASSO for a minimal interpretable predictor set.</p></div></div><div class="vt-item"><span class="vt-num">5</span><div><strong>External Validation</strong><p>Test models on an independent hospital cohort.</p></div></div><div class="vt-item"><span class="vt-num">6</span><div><strong>Richer Clinical Data</strong><p>Add TNM staging, resectability, and treatment variables.</p></div></div><div class="vt-item"><span class="vt-num">7</span><div><strong>Survival Analysis</strong><p>Extend to Cox proportional hazards and Kaplan-Meier curves.</p></div></div><div class="vt-item"><span class="vt-num">8</span><div><strong>Resampling Methods</strong><p>Compare SMOTE/ADASYN against class_weight=&#x27;balanced&#x27;.</p></div></div><div class="vt-item"><span class="vt-num">9</span><div><strong>Patient Explainability</strong><p>Apply SHAP or LIME for individualized risk review.</p></div></div><div class="vt-item"><span class="vt-num">10</span><div><strong>Nested Cross-Validation</strong><p>Obtain unbiased hyperparameter tuning estimates.</p></div></div></div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Connect each item to a limitation from the previous slide.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="29" data-part="VII">
+  <div class="si">
+    <span class="snum">29</span>
+    <h2 class="st">Conclusion</h2>
+    <div class="sb"><div class="vt-list balanced"><div class="vt-item"><span class="vt-num">1</span><div><strong>Supervised Learning</strong><p>RF: 71.02% accuracy (+2.27 pp vs baseline), AUC 0.613, macro F1 0.507. Top features: CEA, Prealbumin, CA19-9.</p></div></div><div class="vt-item"><span class="vt-num">2</span><div><strong>Unsupervised Learning</strong><p>K-Means k=3 identified three clinical phenotypes. Cluster 2 lowest survival (63.2%). Chi-square p = 0.2546.</p></div></div><div class="vt-item"><span class="vt-num">3</span><div><strong>Synthesis</strong><p>Supervised and unsupervised analyses converge on tumor markers, nutrition, and inflammation.</p></div></div><div class="vt-item"><span class="vt-num">4</span><div><strong>Key Takeaway</strong><p>Preoperative features carry limited but real signal for pancreatic cancer survival prediction. Staging and treatment data needed for clinical utility.</p></div></div></div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> 60-second close. No new claims.</aside>
+  </div>
+</section>
+
+<section class="slide hero-slide thank-hero" data-slide="30" data-part="Front">
+  <div class="si">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
+    <div class="hero-inner">
+      <h1>Thank You</h1>
+      <div class="hero-accent-bar"></div>
+      <p class="hero-sub">Questions &amp; Discussion</p>
+      <div class="hero-members">
+        <div class="member"><p class="member-name">Alysa Mariel G. Jayme</p></div>
+        <div class="member"><p class="member-name">Kurt Benedict Wilbur B. Pua</p></div>
+        <div class="member"><p class="member-name">Louis Conrad Andrei S. Tinio</p></div>
+      </div>
+      <p class="hero-footer">Appendix slides available for detailed Q&amp;A backup</p>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Point to appendix for detailed tables.</aside>
+  </div>
+</section>
+
+<section class="slide hero-slide section-hero" data-slide="APP" data-part="APP">
+  <div class="si">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
+    <div class="hero-inner section-inner">
+      <span class="hero-label">APPENDIX</span>
+      <h1>Q&amp;A Backup Slides</h1>
+      <div class="hero-accent-bar"></div>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Backup slides for detailed Q&A.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="A1" data-part="APP">
+  <div class="si">
+    <span class="snum">A1</span>
+    <h2 class="st">Appendix: PCA Colored by Survival Label</h2>
+    <div class="sb"><div class="lr-layout fig-slide">
+      <div class="lr-left"><div class="fig-wrap">
+      <p class="fig-label">Figure 18. PCA scatter colored by true survival label</p>
+      <img src="../figures/pca_survival_labels.png" alt="PCA scatter colored by true survival label" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 6.8</p>
+    </div></div>
+      <div class="lr-right fig-right">
+        <ul><li>Survival classes intermix in 2D</li><li>Explains modest AUC</li><li>Confirms weak linear signal</li></ul>
+        <div class="callout stat compact"><strong>Statistical reading</strong><p>Survival classes overlap heavily in 2D - consistent with weak linear signal and modest AUC.</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>Patients who died within a year (Class 0) are intermixed with survivors in the plot - exactly what you see in practice when two patients with similar preoperative labs have different outcomes because of tumor stage, resection margin, or postoperative complications not in this dataset.</p></div>
+      </div>
+    </div></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Backup for PCA questions.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="A2" data-part="APP">
+  <div class="si">
+    <span class="snum">A2</span>
+    <h2 class="st">Appendix: Full Preprocessing Summary</h2>
+    <div class="sb">
+    <div class="fig-wrap">
+      <p class="fig-label">Figure 19. Full preprocessing decision register</p>
+      <img src="../figures/preprocessing_summary.png" alt="Full preprocessing decision register" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 4.10</p>
+    </div>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Backup for preprocessing Q&A.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="A3" data-part="APP">
+  <div class="si">
+    <span class="snum">A3</span>
+    <h2 class="st">Appendix: Full Classification Report</h2>
+    <div class="sb">
+    <div class="fig-wrap">
+      <p class="fig-label">Figure 20. Per-class precision, recall, F1</p>
+      <img src="../figures/classification_report.png" alt="Per-class precision, recall, F1" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 7.3</p>
+    </div>
+    </div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Per-class detail.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="A4" data-part="APP">
+  <div class="si">
+    <span class="snum">A4</span>
+    <h2 class="st">Appendix: VIF Table (All 20 Features)</h2>
+    <div class="sb"><p class="tbl-label">Table 7. Complete VIF scores</p><table class="dt"><thead><tr><th>Feature</th><th>VIF</th><th>Level</th></tr></thead><tbody><tr><td>CRP/ALB</td><td>131.02</td><td>High</td></tr><tr><td>CRP</td><td>130.21</td><td>High</td></tr><tr><td>Dir. Bilirubin</td><td>77.61</td><td>High</td></tr><tr><td>Tot. Bilirubin</td><td>76.98</td><td>High</td></tr><tr><td>SII</td><td>18.30</td><td>High</td></tr><tr><td>NLR</td><td>12.38</td><td>High</td></tr><tr><td>PLR</td><td>8.21</td><td>Moderate</td></tr><tr><td>Neutrocyte</td><td>7.97</td><td>Moderate</td></tr><tr><td>Platelet</td><td>3.56</td><td>Low</td></tr><tr><td>Lymphocyte</td><td>3.29</td><td>Low</td></tr><tr><td>Leukocyte</td><td>2.48</td><td>Low</td></tr><tr><td>ALB</td><td>1.89</td><td>Low</td></tr><tr><td>Sex</td><td>1.61</td><td>Low</td></tr><tr><td>Abdominal Pain</td><td>1.58</td><td>Low</td></tr><tr><td>Prealbumin</td><td>1.38</td><td>Low</td></tr><tr><td>Lactic Dehydrogenase</td><td>1.22</td><td>Low</td></tr><tr><td>Age</td><td>1.10</td><td>Low</td></tr><tr><td>BMI</td><td>1.06</td><td>Low</td></tr><tr><td>CA19-9</td><td>1.03</td><td>Low</td></tr><tr><td>CEA</td><td>1.01</td><td>Low</td></tr></tbody></table></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Full VIF register.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="A5" data-part="APP">
+  <div class="si">
+    <span class="snum">A5</span>
+    <h2 class="st">Appendix: Model Comparison Highlights</h2>
+    <div class="sb"><p class="tbl-label">Table 8. Supervised benchmark (Section 7.5)</p><table class="dt"><thead><tr><th>Model</th><th>Test Acc</th><th>Macro F1</th><th>AUC</th><th>Cl-0 Recall</th></tr></thead><tbody><tr><td>RF (tuned)</td><td>71.0%</td><td>0.507</td><td>0.613</td><td>10.9% (6/55)</td></tr><tr><td>SVM RBF</td><td>~72%</td><td>0.590</td><td>0.622</td><td>Best among four</td></tr><tr><td>Logistic Regression</td><td>~72%</td><td>~0.55</td><td>~0.61</td><td>Higher than RF</td></tr><tr><td>Gradient Boosting</td><td>~71%</td><td>~0.51</td><td>~0.61</td><td>Moderate</td></tr></tbody></table><p class="fn">RF retained for Gini importance &mdash; not highest metric model.</p><p class="tbl-label">Table 9. Unsupervised benchmark (Section 6.0, k=3)</p><table class="dt"><thead><tr><th>Method</th><th>Chi-sq p</th><th>Assignment</th><th>Selected?</th></tr></thead><tbody><tr><td>K-Means</td><td>0.2546</td><td>100%</td><td>Yes</td></tr><tr><td>GMM</td><td>~0.53</td><td>100%</td><td>Benchmark</td></tr><tr><td>Ward</td><td>~0.65</td><td>100%</td><td>Benchmark</td></tr><tr><td>DBSCAN</td><td>&lt;0.01</td><td>~49%</td><td>Rejected</td></tr></tbody></table></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Backup for model choice questions.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="A6" data-part="APP">
+  <div class="si">
+    <span class="snum">A6</span>
+    <h2 class="st">Appendix: Preprocessing Decision Register</h2>
+    <div class="sb"><p class="tbl-label">Table 10. Full preprocessing register</p><table class="dt"><thead><tr><th>Step</th><th>Action</th><th>Justification</th></tr></thead><tbody><tr><td>Drop ID, Predict labels</td><td>Removed 3 columns</td><td>ID anonymized; Predict columns 100% NaN — unusable labels.</td></tr><tr><td>Missing values</td><td>No imputation</td><td>Zero nulls after column drop; verified three ways.</td></tr><tr><td>Duplicates</td><td>None removed</td><td>0 duplicate rows confirmed.</td></tr><tr><td>Outliers</td><td>Retained all</td><td>IQR/z-score documented; extremes are clinically severe patients.</td></tr><tr><td>Normality transform (Yeo-Johnson)</td><td>Not applied</td><td>RF rank-invariant; StandardScaler sufficient for K-Means.</td></tr><tr><td>Multicollinearity (VIF)</td><td>Retain all 20 features</td><td>RF random feature subsampling; ratio features clinically validated.</td></tr><tr><td>Feature engineering</td><td>None added</td><td>NLR, PLR, SII, CRP/ALB already in dataset.</td></tr><tr><td>Feature selection</td><td>All 20 retained</td><td>Same set for RF and K-Means; importance post-hoc.</td></tr><tr><td>SMOTE</td><td>Not used</td><td>class_weight=&#x27;balanced&#x27; preferred; real patients only.</td></tr><tr><td>RF scaling</td><td>None</td><td>Tree splits are scale-invariant.</td></tr><tr><td>K-Means scaling</td><td>StandardScaler on full X (878×20)</td><td>Euclidean distance requires comparable scales.</td></tr><tr><td>Train-test split</td><td>80/20 stratified, seed=42</td><td>702 train / 176 test; proportions preserved.</td></tr></tbody></table></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Full register for audit questions.</aside>
+  </div>
+</section></div>
+<div id="ctl">
+  <button id="pv" type="button">&#8592; Prev</button>
+  <span id="prog">Slide 1</span>
+  <span id="hint">Arrow / Space = navigate &middot; F = fullscreen &middot; S = speaker notes</span>
+  <button id="nx" type="button">Next &#8594;</button>
+</div>
+<script>
+const S=[...document.querySelectorAll('.slide')];let i=0;
+const P=document.getElementById('prog');
+function go(n){i=Math.max(0,Math.min(S.length-1,n));S.forEach((s,j)=>s.classList.toggle('active',j===i));P.textContent=`Slide ${S[i].dataset.slide||i+1} / ${S.length}`}
+document.getElementById('pv').onclick=()=>go(i-1);
+document.getElementById('nx').onclick=()=>go(i+1);
+document.onkeydown=e=>{
+  if(['ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();go(i+1)}
+  if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(i-1)}
+  if(e.key==='Home')go(0);if(e.key==='End')go(S.length-1);
+  if(e.key==='f'||e.key==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen()}
+  if(e.key==='s'||e.key==='S')document.body.classList.toggle('show-notes');
+};go(0);
+</script></body></html>

@@ -631,18 +631,19 @@ body.show-notes .snotes{display:block}
         <div class="flow-h">
           <div class="fb">Baseline RF<br><small>100 trees / 68.18%</small></div>
           <div class="fa">&rarr;</div>
-          <div class="fb accent">GridSearchCV<br><small>108 combos / 5-fold</small></div>
+          <div class="fb accent">GridSearchCV<br><small>3 objectives / 5-fold</small></div>
           <div class="fa">&rarr;</div>
-          <div class="fb">Tuned RF<br><small>71.02% test</small></div>
+          <div class="fb">Tuned RF (f1_macro)<br><small>61.93% test</small></div>
         </div>
       </div>
       <div class="lr-right">
-        <p class="tbl-label">Table 5. Best hyperparameters</p><table class="dt"><thead><tr><th>Hyperparameter</th><th>Value</th></tr></thead><tbody><tr><td>n_estimators</td><td>300</td></tr><tr><td>max_depth</td><td>15</td></tr><tr><td>min_samples_split</td><td>2</td></tr><tr><td>min_samples_leaf</td><td>1</td></tr><tr><td>class_weight</td><td>balanced</td></tr><tr><td>CV scoring</td><td>f1 (binary / class 1)</td></tr><tr><td>Best CV F1</td><td>~0.809</td></tr></tbody></table>
-        <p class="fn">* CV F1 optimizes positive-class F1, not macro F1 (see slide 23)</p>
+        <p class="tbl-label">Table 5. Primary hyperparameters (f1_macro)</p><table class="dt"><thead><tr><th>Hyperparameter</th><th>Value</th></tr></thead><tbody><tr><td>n_estimators</td><td>100</td></tr><tr><td>max_depth</td><td>5</td></tr><tr><td>min_samples_split</td><td>10</td></tr><tr><td>min_samples_leaf</td><td>4</td></tr><tr><td>class_weight</td><td>balanced</td></tr><tr><td>CV scoring</td><td>f1_macro (primary)</td></tr><tr><td>Best CV macro F1</td><td>0.579</td></tr></tbody></table>
+        <p class="tbl-label">Table 6. Tuning comparison (test set)</p><table class="dt"><thead><tr><th>Objective</th><th>Macro F1</th><th>AUC</th><th>Cl-0 Recall</th></tr></thead><tbody><tr><td>f1 binary (legacy)</td><td>0.507</td><td>0.613</td><td>10.9% (6/55)</td></tr><tr><td>f1_macro (primary)</td><td>0.550</td><td>0.563</td><td>36.4% (20/55)</td></tr><tr><td>recall_macro</td><td>0.550</td><td>0.563</td><td>36.4% (20/55)</td></tr></tbody></table>
+        <p class="fn">Legacy f1 tuning hit 71.0% accuracy but 100% train overfit; f1_macro prioritizes balanced classes.</p>
       </div>
     </div>
     </div>
-    <aside class="snotes"><strong>Speaker notes:</strong> Clarify CV F1 vs test macro F1 before slide 23.</aside>
+    <aside class="snotes"><strong>Speaker notes:</strong> Walk through f1 vs f1_macro vs recall_macro comparison table.</aside>
   </div>
 </section>
 
@@ -651,7 +652,7 @@ body.show-notes .snotes{display:block}
     <span class="snum">20</span>
     <h2 class="st">Random Forest: Test Set Performance</h2>
     <div class="sb">
-    <div class="banner">Test acc: <strong>71.02%</strong> vs baseline <strong>68.8%</strong> (+2.27 pp) &middot; Macro F1: <strong>0.507</strong> &middot; Class-0 recall: <strong>10.9% (6/55)</strong></div>
+    <div class="banner">Test acc: <strong>61.93%</strong> vs baseline <strong>68.8%</strong> (-6.87 pp) &middot; Macro F1: <strong>0.550</strong> &middot; Class-0 recall: <strong>36.4% (20/55)</strong></div>
     <div class="dual-fig"><div class="fig-wrap">
       <p class="fig-label">Figure 13. Confusion matrix (176-patient test set)</p>
       <img src="../figures/confusion_matrix.png" alt="Confusion matrix (176-patient test set)" loading="lazy"/>
@@ -661,7 +662,7 @@ body.show-notes .snotes{display:block}
       <img src="../figures/classification_report.png" alt="Per-class precision, recall, F1" loading="lazy"/>
       <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 7.3</p>
     </div></div>
-    <div class="callout clinical"><strong>Clinical impact</strong><p>Model misses 49 of 55 high-risk patients. Research-grade, not clinic-ready &mdash; but better than baseline (0/55).</p></div>
+    <div class="callout clinical"><strong>Clinical impact</strong><p>Macro-aligned tuning flags 20/55 high-risk patients (up from 6/55 under legacy f1 tuning). Still misses 35/55 &mdash; research-grade, not clinic-ready.</p></div>
     </div>
     <aside class="snotes"><strong>Speaker notes:</strong> Frame as modest improvement, not breakthrough.</aside>
   </div>
@@ -673,17 +674,17 @@ body.show-notes .snotes{display:block}
     <h2 class="st">Random Forest: ROC Curve</h2>
     <div class="sb"><div class="lr-layout fig-slide">
       <div class="lr-left"><div class="fig-wrap">
-      <p class="fig-label">Figure 15. ROC curve with AUC = 0.613</p>
-      <img src="../figures/roc_curve.png" alt="ROC curve with AUC = 0.613" loading="lazy"/>
+      <p class="fig-label">Figure 15. ROC curve with AUC = 0.563</p>
+      <img src="../figures/roc_curve.png" alt="ROC curve with AUC = 0.563" loading="lazy"/>
       <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 7.3</p>
     </div></div>
       <div class="lr-right fig-right">
-        <div class="banner">AUC = 0.613</div><ul><li>Above random (0.5) but below ~0.7 clinical utility</li><li>Reflects weak preoperative signal, not coding failure</li><li>All benchmark models also AUC &lt; 0.63</li></ul>
+        <div class="banner">AUC = 0.563</div><ul><li>Above random (0.5) but below ~0.7 clinical utility</li><li>Lower than legacy f1 tuning (0.613) by design - macro F1 trade-off</li><li>All benchmark models also AUC &lt; 0.63</li></ul>
         <div class="callout stat compact"><strong>Statistical reading</strong><p>Better than random but below ~0.7 threshold often cited for clinical utility.</p></div>
-        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>AUC 0.613 means if you pick one patient who died within a year and one who survived, the model ranks the higher-risk patient higher about 61% of the time - better than a coin flip, but far from the ~0.70+ discrimination oncologists want for treatment decisions.</p></div>
+        <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>AUC 0.563 means if you pick one patient who died within a year and one who survived, the model ranks the higher-risk patient higher about 61% of the time - better than a coin flip, but far from the ~0.70+ discrimination oncologists want for treatment decisions.</p></div>
       </div>
     </div></div>
-    <aside class="snotes"><strong>Speaker notes:</strong> Preempt 'is 0.613 good enough?'</aside>
+    <aside class="snotes"><strong>Speaker notes:</strong> Preempt 'is 0.563 good enough?'</aside>
   </div>
 </section>
 
@@ -698,7 +699,7 @@ body.show-notes .snotes{display:block}
       <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 7.4</p>
     </div></div>
       <div class="lr-right fig-right">
-        <h3>Top 5 (Gini)</h3><ul><li>CEA &mdash; tumor marker</li><li>Prealbumin &mdash; nutritional reserve (low = poor prognosis)</li><li>CA19-9 &mdash; classic pancreatic marker</li><li>Total Bilirubin &mdash; obstructive jaundice burden</li><li>BMI &mdash; body composition</li></ul>
+        <h3>Top 5 (Gini)</h3><ul><li>CEA - tumor marker</li><li>Prealbumin - nutritional reserve (low = poor prognosis)</li><li>CA19-9 - classic pancreatic marker</li><li>CRP/ALB - inflammatory ratio</li><li>BMI - body composition</li></ul>
         <div class="callout stat compact"><strong>Statistical reading</strong><p>Importance spread across tumor markers, nutrition, and inflammation - no single dominant predictor.</p></div>
         <div class="callout clinical compact"><strong>Clinical interpretation</strong><p>CEA and CA19-9 - classic pancreatic tumor markers - rank highly, validating clinical intuition. Prealbumin reflects nutritional reserve; low prealbumin before surgery is a known poor prognostic sign.</p></div>
       </div>
@@ -713,7 +714,7 @@ body.show-notes .snotes{display:block}
     <h2 class="st">Performance Context (Honest Transparency)</h2>
     <div class="sb">
     <div class="transp">
-      <ul><li>Majority baseline = 68.8% &mdash; always report before tuned 71.02%</li><li>All feature-target |r| &lt; 0.15 &mdash; weak univariate signal</li><li>Missing staging, resectability, and treatment variables</li><li>Train accuracy 100% vs test 71% &mdash; 29 pp overfit gap documented</li><li>CV F1 ~0.809 uses binary F1 on class 1; test macro F1 = 0.507 averages both classes</li><li>Class-0 recall 10.9% despite class_weight='balanced'</li></ul>
+      <ul><li>Majority baseline = 68.8% - accuracy alone is misleading under imbalance</li><li>All feature-target |r| &lt; 0.15 - weak univariate signal</li><li>Missing staging, resectability, and treatment variables</li><li>Train 85.8% vs test 61.9% - 23.8 pp overfit gap (down from 29 pp legacy f1)</li><li>Retuned with scoring='f1_macro'; test macro F1 0.550 vs 0.507 legacy f1</li><li>Class-0 recall 36.4% (20/55) vs 10.9% (6/55) under legacy f1 tuning</li></ul>
       <div class="callout clinical hbox"><strong>Core finding</strong><p>Preoperative features carry limited but real signal for pancreatic cancer survival prediction.</p></div>
     </div>
     </div>
@@ -760,7 +761,7 @@ body.show-notes .snotes{display:block}
     <span class="snum">25</span>
     <h2 class="st">Synthesis: Predicted Probability per Cluster</h2>
     <div class="sb">
-    <p class="tbl-label">Table 6. Predicted survival probability per cluster</p><table class="dt"><thead><tr><th>Cluster</th><th>N</th><th>Actual survival %</th><th>Mean predicted %</th><th>Difference</th></tr></thead><tbody><tr><td>0</td><td>519</td><td>70.13</td><td>70.42</td><td>+0.29</td></tr><tr><td>1</td><td>204</td><td>69.61</td><td>67.29</td><td>-2.32</td></tr><tr><td>2</td><td>155</td><td>63.23</td><td>62.32</td><td>-0.91</td></tr></tbody></table><ul><li>Cluster 2: lowest actual and predicted &mdash; aligned ranking</li><li>Cluster 0: slightly over-confident (+0.29 pp)</li><li>Cluster 1: largest gap (-2.32 pp) &mdash; under-confident for hepatobiliary phenotype</li><li>Directional alignment despite modest AUC</li></ul>
+    <p class="tbl-label">Table 7. Predicted survival probability per cluster</p><table class="dt"><thead><tr><th>Cluster</th><th>N</th><th>Actual survival %</th><th>Mean predicted %</th><th>Difference</th></tr></thead><tbody><tr><td>0</td><td>519</td><td>70.13</td><td>70.42</td><td>+0.29</td></tr><tr><td>1</td><td>204</td><td>69.61</td><td>67.29</td><td>-2.32</td></tr><tr><td>2</td><td>155</td><td>63.23</td><td>62.32</td><td>-0.91</td></tr></tbody></table><ul><li>Cluster 2: lowest actual and predicted &mdash; aligned ranking</li><li>Cluster 0: slightly over-confident (+0.29 pp)</li><li>Cluster 1: largest gap (-2.32 pp) &mdash; under-confident for hepatobiliary phenotype</li><li>Directional alignment despite modest AUC</li></ul>
     <div class="callout clinical"><strong>Clinical reading</strong><p>Even a modest model ranks clusters coherently &mdash; high-inflammation Cluster 2 receives lowest predicted survival.</p></div>
     </div>
     <aside class="snotes"><strong>Speaker notes:</strong> Bridge supervised probabilities to unsupervised structure.</aside>
@@ -806,8 +807,8 @@ body.show-notes .snotes{display:block}
       </div>
       <div class="lr-right">
         <h3>Model &amp; Analysis</h3>
-        <ol start="6"><li>Severe RF overfit (100% train vs 71% test)</li>
-        <li>Low class-0 recall (10.9%) &mdash; clinically insufficient alone</li>
+        <ol start="6"><li>RF overfit reduced but present (85.8% train vs 61.9% test)</li>
+        <li>Class-0 recall 36.4% (20/55) - improved vs legacy tuning but still insufficient alone</li>
         <li>K-Means assumes spherical, equal-variance clusters</li>
         <li>Multicollinearity may affect ratio-feature interpretation</li>
         <li>Cluster-survival association not significant (p=0.2546)</li>
@@ -832,7 +833,7 @@ body.show-notes .snotes{display:block}
   <div class="si">
     <span class="snum">29</span>
     <h2 class="st">Conclusion</h2>
-    <div class="sb"><div class="vt-list balanced"><div class="vt-item"><span class="vt-num">1</span><div><strong>Supervised Learning</strong><p>RF: 71.02% accuracy (+2.27 pp vs baseline), AUC 0.613, macro F1 0.507. Top features: CEA, Prealbumin, CA19-9.</p></div></div><div class="vt-item"><span class="vt-num">2</span><div><strong>Unsupervised Learning</strong><p>K-Means k=3 identified three clinical phenotypes. Cluster 2 lowest survival (63.2%). Chi-square p = 0.2546.</p></div></div><div class="vt-item"><span class="vt-num">3</span><div><strong>Synthesis</strong><p>Supervised and unsupervised analyses converge on tumor markers, nutrition, and inflammation.</p></div></div><div class="vt-item"><span class="vt-num">4</span><div><strong>Key Takeaway</strong><p>Preoperative features carry limited but real signal for pancreatic cancer survival prediction. Staging and treatment data needed for clinical utility.</p></div></div></div></div>
+    <div class="sb"><div class="vt-list balanced"><div class="vt-item"><span class="vt-num">1</span><div><strong>Supervised Learning</strong><p>RF (f1_macro tuned): 61.93% test accuracy, AUC 0.563, macro F1 0.550. Top features: CA19-9, CEA, Prealbumin.</p></div></div><div class="vt-item"><span class="vt-num">2</span><div><strong>Unsupervised Learning</strong><p>K-Means k=3 identified three clinical phenotypes. Cluster 2 lowest survival (63.2%). Chi-square p = 0.2546.</p></div></div><div class="vt-item"><span class="vt-num">3</span><div><strong>Synthesis</strong><p>Supervised and unsupervised analyses converge on tumor markers, nutrition, and inflammation.</p></div></div><div class="vt-item"><span class="vt-num">4</span><div><strong>Key Takeaway</strong><p>Preoperative features carry limited but real signal for pancreatic cancer survival prediction. Staging and treatment data needed for clinical utility.</p></div></div></div></div>
     <aside class="snotes"><strong>Speaker notes:</strong> 60-second close. No new claims.</aside>
   </div>
 </section>
@@ -925,7 +926,7 @@ body.show-notes .snotes{display:block}
   <div class="si">
     <span class="snum">A4</span>
     <h2 class="st">Appendix: VIF Table (All 20 Features)</h2>
-    <div class="sb"><p class="tbl-label">Table 7. Complete VIF scores</p><table class="dt"><thead><tr><th>Feature</th><th>VIF</th><th>Level</th></tr></thead><tbody><tr><td>CRP/ALB</td><td>131.02</td><td>High</td></tr><tr><td>CRP</td><td>130.21</td><td>High</td></tr><tr><td>Dir. Bilirubin</td><td>77.61</td><td>High</td></tr><tr><td>Tot. Bilirubin</td><td>76.98</td><td>High</td></tr><tr><td>SII</td><td>18.30</td><td>High</td></tr><tr><td>NLR</td><td>12.38</td><td>High</td></tr><tr><td>PLR</td><td>8.21</td><td>Moderate</td></tr><tr><td>Neutrocyte</td><td>7.97</td><td>Moderate</td></tr><tr><td>Platelet</td><td>3.56</td><td>Low</td></tr><tr><td>Lymphocyte</td><td>3.29</td><td>Low</td></tr><tr><td>Leukocyte</td><td>2.48</td><td>Low</td></tr><tr><td>ALB</td><td>1.89</td><td>Low</td></tr><tr><td>Sex</td><td>1.61</td><td>Low</td></tr><tr><td>Abdominal Pain</td><td>1.58</td><td>Low</td></tr><tr><td>Prealbumin</td><td>1.38</td><td>Low</td></tr><tr><td>Lactic Dehydrogenase</td><td>1.22</td><td>Low</td></tr><tr><td>Age</td><td>1.10</td><td>Low</td></tr><tr><td>BMI</td><td>1.06</td><td>Low</td></tr><tr><td>CA19-9</td><td>1.03</td><td>Low</td></tr><tr><td>CEA</td><td>1.01</td><td>Low</td></tr></tbody></table></div>
+    <div class="sb"><p class="tbl-label">Table 8. Complete VIF scores</p><table class="dt"><thead><tr><th>Feature</th><th>VIF</th><th>Level</th></tr></thead><tbody><tr><td>CRP/ALB</td><td>131.02</td><td>High</td></tr><tr><td>CRP</td><td>130.21</td><td>High</td></tr><tr><td>Dir. Bilirubin</td><td>77.61</td><td>High</td></tr><tr><td>Tot. Bilirubin</td><td>76.98</td><td>High</td></tr><tr><td>SII</td><td>18.30</td><td>High</td></tr><tr><td>NLR</td><td>12.38</td><td>High</td></tr><tr><td>PLR</td><td>8.21</td><td>Moderate</td></tr><tr><td>Neutrocyte</td><td>7.97</td><td>Moderate</td></tr><tr><td>Platelet</td><td>3.56</td><td>Low</td></tr><tr><td>Lymphocyte</td><td>3.29</td><td>Low</td></tr><tr><td>Leukocyte</td><td>2.48</td><td>Low</td></tr><tr><td>ALB</td><td>1.89</td><td>Low</td></tr><tr><td>Sex</td><td>1.61</td><td>Low</td></tr><tr><td>Abdominal Pain</td><td>1.58</td><td>Low</td></tr><tr><td>Prealbumin</td><td>1.38</td><td>Low</td></tr><tr><td>Lactic Dehydrogenase</td><td>1.22</td><td>Low</td></tr><tr><td>Age</td><td>1.10</td><td>Low</td></tr><tr><td>BMI</td><td>1.06</td><td>Low</td></tr><tr><td>CA19-9</td><td>1.03</td><td>Low</td></tr><tr><td>CEA</td><td>1.01</td><td>Low</td></tr></tbody></table></div>
     <aside class="snotes"><strong>Speaker notes:</strong> Full VIF register.</aside>
   </div>
 </section>
@@ -934,16 +935,48 @@ body.show-notes .snotes{display:block}
   <div class="si">
     <span class="snum">A5</span>
     <h2 class="st">Appendix: Model Comparison Highlights</h2>
-    <div class="sb"><p class="tbl-label">Table 8. Supervised benchmark (Section 7.5)</p><table class="dt"><thead><tr><th>Model</th><th>Test Acc</th><th>Macro F1</th><th>AUC</th><th>Cl-0 Recall</th></tr></thead><tbody><tr><td>RF (tuned)</td><td>71.0%</td><td>0.507</td><td>0.613</td><td>10.9% (6/55)</td></tr><tr><td>SVM RBF</td><td>~72%</td><td>0.590</td><td>0.622</td><td>Best among four</td></tr><tr><td>Logistic Regression</td><td>~72%</td><td>~0.55</td><td>~0.61</td><td>Higher than RF</td></tr><tr><td>Gradient Boosting</td><td>~71%</td><td>~0.51</td><td>~0.61</td><td>Moderate</td></tr></tbody></table><p class="fn">RF retained for Gini importance &mdash; not highest metric model.</p><p class="tbl-label">Table 9. Unsupervised benchmark (Section 6.0, k=3)</p><table class="dt"><thead><tr><th>Method</th><th>Chi-sq p</th><th>Assignment</th><th>Selected?</th></tr></thead><tbody><tr><td>K-Means</td><td>0.2546</td><td>100%</td><td>Yes</td></tr><tr><td>GMM</td><td>~0.53</td><td>100%</td><td>Benchmark</td></tr><tr><td>Ward</td><td>~0.65</td><td>100%</td><td>Benchmark</td></tr><tr><td>DBSCAN</td><td>&lt;0.01</td><td>~49%</td><td>Rejected</td></tr></tbody></table></div>
-    <aside class="snotes"><strong>Speaker notes:</strong> Backup for model choice questions.</aside>
+    <div class="sb"><p class="tbl-label">Table 9. Supervised benchmark (Section 7.5)</p><table class="dt"><thead><tr><th>Model</th><th>Test Acc</th><th>Macro F1</th><th>AUC</th><th>Cl-0 Recall</th></tr></thead><tbody><tr><td>RF (f1_macro tuned)</td><td>61.9%</td><td>0.550</td><td>0.563</td><td>36.4% (20/55)</td></tr><tr><td>SVM RBF</td><td>61.9%</td><td>0.590</td><td>0.622</td><td>56.4% (31/55)</td></tr><tr><td>Logistic Regression</td><td>55.1%</td><td>0.539</td><td>0.599</td><td>61.8% (34/55)</td></tr><tr><td>Gradient Boosting</td><td>63.6%</td><td>0.482</td><td>0.581</td><td>14.5% (8/55)</td></tr></tbody></table><p class="fn">RF retained for Gini importance - f1_macro tuning improved macro F1 vs legacy f1 (0.507).</p><p class="tbl-label">Table 10. Unsupervised benchmark (Section 6.0, k=3)</p><table class="dt"><thead><tr><th>Method</th><th>Chi-sq p</th><th>Assignment</th><th>Selected?</th></tr></thead><tbody><tr><td>K-Means</td><td>0.2546</td><td>100%</td><td>Yes</td></tr><tr><td>GMM</td><td>0.5259</td><td>100%</td><td>Benchmark</td></tr><tr><td>Ward (k=3)</td><td>0.6478</td><td>100%</td><td>Benchmark</td></tr><tr><td>DBSCAN</td><td>0.0090</td><td>~49%</td><td>Rejected</td></tr></tbody></table></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Quick-reference table; see A6–A7 for full comparison figures.</aside>
   </div>
 </section>
 
 <section class="slide" data-slide="A6" data-part="APP">
   <div class="si">
     <span class="snum">A6</span>
+    <h2 class="st">Appendix: Supervised Model Comparison (Section 7.5)</h2>
+    <div class="sb">
+    <p class="sub">Same train-test split (702/176), random_state=42 &mdash; from notebook Section 7.5</p>
+    <div class="fig-wrap">
+      <p class="fig-label">Figure 21. Test accuracy, macro F1, AUC-ROC, and class-0 recall across four classifiers</p>
+      <img src="../figures/supervised_model_comparison.png" alt="Test accuracy, macro F1, AUC-ROC, and class-0 recall across four classifiers" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 7.5</p>
+    </div>
+    <ul><li>SVM RBF: highest macro F1 (0.590) and AUC (0.622)</li><li>RF (f1_macro): 36.4% class-0 recall (20/55) vs 10.9% under legacy f1 tuning</li><li>RF retained as primary model for built-in Gini importance (Section 8 synthesis)</li><li>All models: AUC &lt; 0.63 &mdash; no clinical utility threshold (0.7)</li></ul></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Point to bars during model-choice Q&amp;A.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="A7" data-part="APP">
+  <div class="si">
+    <span class="snum">A7</span>
+    <h2 class="st">Appendix: Unsupervised Method Comparison (Section 6.0)</h2>
+    <div class="sb">
+    <p class="sub">K-Means vs GMM vs Ward vs DBSCAN on scaled features (878 patients) &mdash; notebook Section 6.0</p>
+    <div class="fig-wrap">
+      <p class="fig-label">Figure 22. Silhouette, chi-square p-value, and survival spread at k=3</p>
+      <img src="../figures/unsupervised_model_comparison.png" alt="Silhouette, chi-square p-value, and survival spread at k=3" loading="lazy"/>
+      <p class="fig-cap">Source: PCSPF Capstone, n=878, Section 6.0</p>
+    </div>
+    <ul><li>K-Means (k=3): selected &mdash; 100% assignment, interpretable centroids</li><li>Chi-square p = 0.2546 (not significant); clusters are phenotypes, not proven prognostic groups</li><li>DBSCAN: lower p but ~49% patients unassigned &mdash; rejected for defense cohort coverage</li><li>Silhouette best at k=2; k=3 chosen for three clinical profiles</li></ul></div>
+    <aside class="snotes"><strong>Speaker notes:</strong> Backup when panel asks why not GMM/DBSCAN.</aside>
+  </div>
+</section>
+
+<section class="slide" data-slide="A8" data-part="APP">
+  <div class="si">
+    <span class="snum">A8</span>
     <h2 class="st">Appendix: Preprocessing Decision Register</h2>
-    <div class="sb"><p class="tbl-label">Table 10. Full preprocessing register</p><table class="dt"><thead><tr><th>Step</th><th>Action</th><th>Justification</th></tr></thead><tbody><tr><td>Drop ID, Predict labels</td><td>Removed 3 columns</td><td>ID anonymized; Predict columns 100% NaN — unusable labels.</td></tr><tr><td>Missing values</td><td>No imputation</td><td>Zero nulls after column drop; verified three ways.</td></tr><tr><td>Duplicates</td><td>None removed</td><td>0 duplicate rows confirmed.</td></tr><tr><td>Outliers</td><td>Retained all</td><td>IQR/z-score documented; extremes are clinically severe patients.</td></tr><tr><td>Normality transform (Yeo-Johnson)</td><td>Not applied</td><td>RF rank-invariant; StandardScaler sufficient for K-Means.</td></tr><tr><td>Multicollinearity (VIF)</td><td>Retain all 20 features</td><td>RF random feature subsampling; ratio features clinically validated.</td></tr><tr><td>Feature engineering</td><td>None added</td><td>NLR, PLR, SII, CRP/ALB already in dataset.</td></tr><tr><td>Feature selection</td><td>All 20 retained</td><td>Same set for RF and K-Means; importance post-hoc.</td></tr><tr><td>SMOTE</td><td>Not used</td><td>class_weight=&#x27;balanced&#x27; preferred; real patients only.</td></tr><tr><td>RF scaling</td><td>None</td><td>Tree splits are scale-invariant.</td></tr><tr><td>K-Means scaling</td><td>StandardScaler on full X (878×20)</td><td>Euclidean distance requires comparable scales.</td></tr><tr><td>Train-test split</td><td>80/20 stratified, seed=42</td><td>702 train / 176 test; proportions preserved.</td></tr></tbody></table></div>
+    <div class="sb"><p class="tbl-label">Table 11. Full preprocessing register</p><table class="dt"><thead><tr><th>Step</th><th>Action</th><th>Justification</th></tr></thead><tbody><tr><td>Drop ID, Predict labels</td><td>Removed 3 columns</td><td>ID anonymized; Predict columns 100% NaN — unusable labels.</td></tr><tr><td>Missing values</td><td>No imputation</td><td>Zero nulls after column drop; verified three ways.</td></tr><tr><td>Duplicates</td><td>None removed</td><td>0 duplicate rows confirmed.</td></tr><tr><td>Outliers</td><td>Retained all</td><td>IQR/z-score documented; extremes are clinically severe patients.</td></tr><tr><td>Normality transform (Yeo-Johnson)</td><td>Not applied</td><td>RF rank-invariant; StandardScaler sufficient for K-Means.</td></tr><tr><td>Multicollinearity (VIF)</td><td>Retain all 20 features</td><td>RF random feature subsampling; ratio features clinically validated.</td></tr><tr><td>Feature engineering</td><td>None added</td><td>NLR, PLR, SII, CRP/ALB already in dataset.</td></tr><tr><td>Feature selection</td><td>All 20 retained</td><td>Same set for RF and K-Means; importance post-hoc.</td></tr><tr><td>SMOTE</td><td>Not used</td><td>class_weight=&#x27;balanced&#x27; preferred; real patients only.</td></tr><tr><td>RF scaling</td><td>None</td><td>Tree splits are scale-invariant.</td></tr><tr><td>K-Means scaling</td><td>StandardScaler on full X (878×20)</td><td>Euclidean distance requires comparable scales.</td></tr><tr><td>Train-test split</td><td>80/20 stratified, seed=42</td><td>702 train / 176 test; proportions preserved.</td></tr></tbody></table></div>
     <aside class="snotes"><strong>Speaker notes:</strong> Full register for audit questions.</aside>
   </div>
 </section></div>

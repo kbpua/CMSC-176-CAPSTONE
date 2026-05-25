@@ -269,7 +269,7 @@ FIGURE_GUIDE = [
     },
     {
         "num": 16, "file": "confusion_matrix.png", "section": "7.3",
-        "shows": "Tuned RF predictions on 176-patient test set. Only 6/55 (10.9%) high-risk patients correctly identified.",
+        "shows": "Tuned RF (f1_macro) predictions on 176-patient test set. 20/55 (36.4%) high-risk patients correctly identified (up from 6/55 under legacy f1 tuning).",
         "interpretation": "Model predicts majority class well but misses 49 of 55 Class-0 patients (false negatives).",
         "clinical_interpretation": (
             "Of 55 patients who actually died within a year, the model flagged only 6 - it would send 49 high-risk "
@@ -287,26 +287,26 @@ FIGURE_GUIDE = [
     },
     {
         "num": 17, "file": "roc_curve.png", "section": "7.3",
-        "shows": "ROC curve with AUC = 0.613 vs diagonal (random = 0.5).",
+        "shows": "ROC curve with AUC = 0.563 vs diagonal (random = 0.5). Lower than legacy f1 tuning (0.613) by macro-F1 design.",
         "interpretation": "Better than random but below ~0.7 threshold often cited for clinical utility.",
         "clinical_interpretation": (
-            "AUC 0.613 means if you pick one patient who died within a year and one who survived, the model ranks "
+            "AUC 0.563 means if you pick one patient who died within a year and one who survived, the model ranks "
             "the higher-risk patient higher about 61% of the time - better than a coin flip, but far from the ~0.70+ "
             "discrimination oncologists want for treatment decisions."
         ),
         "implications": "Performance ceiling is data-limited; all benchmark models also AUC < 0.63.",
         "clinical_implication": (
-            "Preempt the 'is 0.613 good enough?' question: 'No - not for deployment. Yes - for research, because it "
+            "Preempt the 'is 0.563 good enough?' question: 'No - not for deployment. Yes - for research, because it "
             "proves preoperative labs contain real but incomplete prognostic information, and it tells us where to "
             "add staging, pathology, and treatment features next.'"
         ),
-        "point_out": "AUC 0.613 = limited but non-zero discrimination.",
-        "dont_claim": "Do not call 0.613 'good' or 'clinical-grade'.",
+        "point_out": "AUC 0.563 = limited but non-zero discrimination; macro F1 tuning trades AUC for class-0 recall.",
+        "dont_claim": "Do not call 0.563 'good' or 'clinical-grade'.",
     },
     {
         "num": 18, "file": "classification_report.png", "section": "7.3",
         "shows": "Per-class precision, recall, and F1 for Class 0 (died <1 yr) and Class 1 (survived >=1 yr).",
-        "interpretation": "Class 1 (majority): strong recall. Class 0 (minority): weak recall despite balanced weights - macro F1 = 0.507.",
+        "interpretation": "Class 1 (majority): moderate recall. Class 0 (minority): improved recall (36.4%) after f1_macro tuning - macro F1 = 0.550.",
         "clinical_interpretation": (
             "The model is good at confirming patients who will survive at least a year - the easier, majority case. "
             "It performs poorly on the minority who die within a year - the patients clinicians most need to identify "

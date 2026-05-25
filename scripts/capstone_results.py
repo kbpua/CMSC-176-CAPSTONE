@@ -1,0 +1,50 @@
+# -*- coding: utf-8 -*-
+"""Canonical capstone metrics after f1_macro RF optimization (notebook run)."""
+
+RESULTS = {
+    "baseline_acc": "68.8%",
+    "untuned_acc": "68.18%",
+    "tuned_acc": "61.93%",
+    "train_acc": "85.8%",
+    "overfit_gap": "23.8 pp",
+    "improvement_pp": "-6.87",
+    "improvement_from_untuned_pp": "-6.25",
+    "auc": "0.563",
+    "macro_f1": "0.550",
+    "cv_macro_f1": "0.579",
+    "cv_f1_binary_legacy": "0.809",
+    "class0_recall": "36.4% (20/55)",
+    "class0_recall_pct": "36.4%",
+    "class0_recall_frac": "20/55",
+    "gridsearch_scoring": "f1_macro",
+    "best_rf_params": {
+        "n_estimators": 100,
+        "max_depth": 5,
+        "min_samples_split": 10,
+        "min_samples_leaf": 4,
+    },
+    "legacy_tuned": {
+        "test_acc": "71.02%",
+        "macro_f1": "0.507",
+        "auc": "0.613",
+        "train_acc": "100.0%",
+        "overfit_gap": "29.0 pp",
+        "class0_recall": "10.9% (6/55)",
+        "cv_f1_binary": "0.809",
+        "params": "depth=15, leaf=1, split=2, n=300",
+    },
+    "tuning_comparison": [
+        ("f1 (binary, legacy grid)", "0.809", "100.0%", "71.0%", "29.0 pp", "0.507", "0.613", "10.9% (6/55)"),
+        ("f1_macro (primary)", "0.579", "85.8%", "61.9%", "23.8 pp", "0.550", "0.563", "36.4% (20/55)"),
+        ("recall_macro (stretch)", "0.579", "85.8%", "61.9%", "23.8 pp", "0.550", "0.563", "36.4% (20/55)"),
+    ],
+    "model_comparison": [
+        ("Random Forest (tuned, primary)", "61.9%", "0.550", "0.563", "36.4% (20/55)", "Yes (Gini)", "85.8% train — reduced overfit vs legacy"),
+        ("Logistic Regression", "55.1%", "0.539", "0.599", "61.8% (34/55)", "No (needs SHAP)", "Best class-0 recall among benchmarks"),
+        ("SVM RBF", "61.9%", "0.590", "0.622", "56.4% (31/55)", "No (needs SHAP)", "Highest macro F1 & AUC"),
+        ("Gradient Boosting", "63.6%", "0.482", "0.581", "14.5% (8/55)", "Yes (Gini)", "High train acc — overfits"),
+    ],
+    "top_features": ["CA19-9", "CEA", "Prealbumin", "CRP/ALB", "BMI"],
+    "chi2_p": "0.2546",
+    "cramers_v": "0.056",
+}

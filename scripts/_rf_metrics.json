@@ -1,0 +1,18 @@
+{
+  "best_params": "{'max_depth': 15, 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 300}",
+  "cv_macro_f1": "0.5786",
+  "test_acc": "61.93",
+  "train_acc": "85.8",
+  "test_acc_overfit": "61.9",
+  "overfit_gap": "23.8",
+  "macro_f1_train": "0.835",
+  "macro_f1": "0.550",
+  "auc": "0.563",
+  "primary_train_acc": "85.8",
+  "primary_test_acc": "61.9",
+  "primary_gap": "23.8",
+  "primary_macro_f1": "0.550",
+  "primary_auc": "0.563",
+  "class0_recall": "36.4% (20/55)",
+  "legacy_cv_f1_binary": "0.8091"
+}

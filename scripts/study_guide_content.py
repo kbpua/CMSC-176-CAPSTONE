@@ -36,9 +36,10 @@ EXECUTIVE_OVERVIEW = {
         "biomarkers drive both prediction and grouping."
     ),
     "headline_results": [
-        "Tuned RF: 71.02% test accuracy (+2.27 pp vs 68.8% majority baseline), AUC 0.613, macro F1 0.507.",
-        "K-Means k=3: three phenotypes with survival ranging 63.2%–70.1%; chi-square p = 0.2546 (not significant).",
-        "Top RF features (CEA, Prealbumin, CA19-9) overlap with cluster differentiation — directional convergence.",
+        "Primary RF (f1_macro tuned): 61.93% test accuracy, macro F1 0.550, AUC 0.563, class-0 recall 36.4% (20/55).",
+        "Legacy f1 tuning (reference): 71.02% accuracy, macro F1 0.507, class-0 recall 10.9% (6/55) — higher accuracy, worse minority recall.",
+        "K-Means k=3: three phenotypes with survival ranging 63.2%-70.1%; chi-square p = 0.2546 (not significant).",
+        "Top RF features (CA19-9, CEA, Prealbumin) overlap with cluster differentiation - directional convergence.",
         CORE_FINDING,
     ],
     "how_to_use": (
@@ -258,27 +259,28 @@ NUMBER_BANK = {
         ("Method", "Stratified (preserves class proportions)"),
         ("random_state", "42"),
     ],
-    "Supervised (tuned RF)": [
-        ("Test accuracy", "71.02%"),
+    "Supervised (primary RF, f1_macro tuned)": [
+        ("Test accuracy", "61.93%"),
         ("Majority baseline", "68.8%"),
-        ("Improvement", "+2.27 percentage points"),
+        ("Vs baseline", "-6.87 percentage points (macro F1 trade-off)"),
         ("Untuned RF test acc", "68.18%"),
-        ("Train accuracy", "100.00%"),
-        ("Overfit gap", "29.0 pp"),
-        ("Macro F1 (test)", "0.507"),
-        ("AUC-ROC (test)", "0.613"),
-        ("Class-0 recall", "10.9% (6 / 55 in test set)"),
-        ("CV F1 (GridSearch, binary)", "~0.809"),
-        ("CV macro F1 (comparison)", "~0.507"),
+        ("Train accuracy", "85.8%"),
+        ("Overfit gap", "23.8 pp"),
+        ("Macro F1 (test)", "0.550"),
+        ("AUC-ROC (test)", "0.563"),
+        ("Class-0 recall", "36.4% (20 / 55 in test set)"),
+        ("CV macro F1 (GridSearch primary)", "0.579"),
+        ("Legacy f1 tuning (reference)", "71.02% acc, 0.507 macro F1, 10.9% cl-0 recall"),
     ],
-    "Tuned hyperparameters": [
-        ("n_estimators", "300"),
-        ("max_depth", "15"),
-        ("min_samples_leaf", "1"),
-        ("min_samples_split", "2"),
-        ("Grid combinations", "108"),
+    "Tuned hyperparameters (primary)": [
+        ("n_estimators", "100"),
+        ("max_depth", "5"),
+        ("min_samples_leaf", "4"),
+        ("min_samples_split", "10"),
+        ("Grid combinations (regularized)", "135 per objective"),
+        ("Tuning objectives compared", "f1 (legacy), f1_macro (primary), recall_macro (stretch)"),
         ("Cross-validation", "5-fold StratifiedKFold"),
-        ("GridSearch scoring", "f1 (binary / positive class)"),
+        ("GridSearch scoring (primary)", "f1_macro"),
         ("class_weight", "balanced"),
     ],
     "class_weight formula": [
@@ -304,7 +306,7 @@ NUMBER_BANK = {
         ("Not visible in 2D", "69.2% of variance"),
     ],
     "Top RF features (Gini)": [
-        ("Rank 1–5", "CEA, Prealbumin, CA19-9, Total Bilirubin, BMI"),
+        ("Rank 1-5", "CA19-9, CEA, Prealbumin, CRP/ALB, BMI"),
     ],
     "Model comparison highlight": [
         ("Best macro F1", "SVM RBF ~0.590"),
@@ -362,16 +364,16 @@ SUPERVISED_COMPARISON_A = {
     "title": "Table 9A — Accuracy and discrimination",
     "headers": ["Model", "Train Acc", "Test Acc", "Overfit Gap", "Macro F1", "AUC"],
     "rows": [
-        ["RF (tuned)", "100.0%", "71.0%", "29.0 pp", "0.507", "0.613"],
-        ["Logistic Regression", "~72%", "~72%", "Smaller gap", "~0.55", "~0.61"],
-        ["SVM RBF", "~72%", "~72%", "Moderate gap", "0.590", "0.622"],
-        ["Gradient Boosting", "~71%", "~71%", "Moderate gap", "~0.51", "~0.61"],
+        ["RF (f1_macro tuned)", "85.8%", "61.9%", "23.8 pp", "0.550", "0.563"],
+        ["Logistic Regression", "65.0%", "55.1%", "9.8 pp", "0.539", "0.599"],
+        ["SVM RBF", "75.5%", "61.9%", "13.6 pp", "0.590", "0.622"],
+        ["Gradient Boosting", "98.3%", "63.6%", "34.7 pp", "0.482", "0.581"],
     ],
     "col_fracs": [0.22, 0.13, 0.13, 0.16, 0.16, 0.20],
     "clinical_note": (
         "Clinically: all models stay below AUC 0.63 — none reach deployable discrimination from labs alone. "
         "SVM RBF ranks highest but still cannot reliably separate 1-year survivors from non-survivors. "
-        "RF's 29 pp overfit gap means it memorized training patterns — a red flag for real patients."
+        "RF's 23.8 pp overfit gap is reduced vs legacy f1 tuning (29 pp) but test accuracy falls below baseline by design."
     ),
 }
 
@@ -379,15 +381,15 @@ SUPERVISED_COMPARISON_B = {
     "title": "Table 9B — Minority class and interpretability",
     "headers": ["Model", "F1 Class 0", "F1 Class 1", "Class-0 Recall", "CV Macro F1", "Feature Importance"],
     "rows": [
-        ["RF (tuned)", "Low", "High", "10.9% (6/55)", "~0.507", "Yes — Gini"],
-        ["Logistic Regression", "Higher", "High", "Higher than RF", "~0.55", "No — needs SHAP"],
-        ["SVM RBF", "Best balanced", "High", "Best among four", "~0.59", "No — needs SHAP"],
-        ["Gradient Boosting", "Moderate", "High", "Moderate", "~0.51", "Yes — Gini"],
+        ["RF (f1_macro tuned)", "0.374", "0.727", "36.4% (20/55)", "0.579", "Yes — Gini"],
+        ["Logistic Regression", "0.463", "0.615", "61.8% (34/55)", "0.572", "No — needs SHAP"],
+        ["SVM RBF", "0.481", "0.700", "56.4% (31/55)", "0.587", "No — needs SHAP"],
+        ["Gradient Boosting", "0.200", "0.765", "14.5% (8/55)", "0.550", "Yes — Gini"],
     ],
     "col_fracs": [0.20, 0.14, 0.14, 0.18, 0.16, 0.18],
     "clinical_note": (
         "Clinically: Class-0 recall is what matters for catching patients who die within a year. "
-        "RF finds only 6 of 55 — unacceptable alone, but non-zero vs baseline (0/55). "
+        "RF (f1_macro tuned) finds 20 of 55 high-risk patients — still insufficient alone but improved vs legacy f1 tuning (6/55) and baseline (0/55)."
         "We kept RF because Gini importance powers the synthesis bridge in Section 8."
     ),
 }
@@ -432,27 +434,26 @@ UNSUPERVISED_COMPARISON_B = {
 # PART 8 — Weak results defense scripts
 # ---------------------------------------------------------------------------
 DEFENSE_SCRIPTS = [
-    ("Accuracy 71.02% (only +2.27 pp over 68.8% baseline)",
-     "Acknowledge: The tuned model beats the majority baseline by only 2.27 percentage points. "
-     "Contextualize: All feature-target correlations are |r| < 0.15; preoperative labs alone lack "
-     "strong signal. Reframe: The gain is real but modest — we detect 6/55 high-risk patients vs "
-     "0/55 for the baseline. Value: Honest reporting sets appropriate expectations; the pipeline "
-     "documents what preoperative data can and cannot do."),
-    ("AUC 0.613 (below clinical utility ~0.7)",
-     "Acknowledge: 0.613 is below the 0.7 threshold often cited for clinical deployment. "
-     "Contextualize: SVM RBF, the best benchmark, reaches only ~0.622 — the ceiling is dataset-level. "
-     "Reframe: AUC > 0.5 confirms non-random signal exists in preoperative features. Value: "
-     "Identifies which markers matter (CEA, Prealbumin, CA19-9) for future multimodal models."),
-    ("Overfitting (100% train vs 71% test)",
-     "Acknowledge: GridSearch selected deep trees (depth=15) that memorize training data. "
-     "Contextualize: Regularization analysis shows shallower trees reduce gap to ~11 pp but "
-     "lower accuracy and different recall trade-offs. Reframe: We document overfitting transparently "
-     "in Section 7.3 — not hidden. Value: Demonstrates understanding of bias-variance trade-off."),
-    ("Class-0 recall 10.9% (6/55)",
-     "Acknowledge: The model misses 49 of 55 high-risk test patients — clinically unacceptable alone. "
-     "Contextualize: class_weight='balanced' helps but cannot overcome weak features and imbalance. "
-     "Reframe: vs baseline (0% recall), RF provides non-zero risk detection. Regularized configs "
-     "reach ~51% recall at accuracy cost. Value: Frames honest clinical limitation and future SMOTE/Cox work."),
+    ("Test accuracy 61.93% (below 68.8% majority baseline)",
+     "Acknowledge: Primary f1_macro tuning yields 61.93% test accuracy — below the 68.8% majority baseline. "
+     "Contextualize: Baseline accuracy is misleading under imbalance (0% high-risk detection). "
+     "Reframe: Macro-aligned tuning improves macro F1 (0.507 to 0.550) and class-0 recall (10.9% to 36.4%). "
+     "Value: Shows we optimized for balanced evaluation, not accuracy alone."),
+    ("AUC 0.563 (below clinical utility ~0.7)",
+     "Acknowledge: 0.563 is below the 0.7 threshold often cited for clinical deployment — and lower than legacy f1 tuning (0.613). "
+     "Contextualize: SVM RBF, the best benchmark, reaches 0.622 — the ceiling is dataset-level. "
+     "Reframe: AUC > 0.5 confirms non-random signal; macro F1 tuning trades AUC for minority recall. Value: "
+     "Identifies which markers matter (CA19-9, CEA, Prealbumin) for future multimodal models."),
+    ("Overfitting (85.8% train vs 61.9% test)",
+     "Acknowledge: Primary model still overfits with a 23.8 pp gap. "
+     "Contextualize: Legacy f1 tuning reached 100% train / 29 pp gap; f1_macro tuning reduced memorization. "
+     "Reframe: Regularization analysis and three-objective tuning table document the trade-off transparently. "
+     "Value: Demonstrates understanding of bias-variance trade-off under weak signal."),
+    ("Class-0 recall 36.4% (20/55)",
+     "Acknowledge: The model still misses 35 of 55 high-risk test patients — clinically unacceptable alone. "
+     "Contextualize: Improved from 6/55 under legacy f1 tuning; SVM reaches 31/55 and LR 34/55 on same split. "
+     "Reframe: vs baseline (0/55), macro-aligned RF provides meaningful risk detection progress. "
+     "Value: Frames honest clinical limitation; threshold sweep in Section 7.2 explores trade-offs."),
     ("Chi-square p = 0.2546 (not significant)",
      "Acknowledge: We cannot reject independence of cluster and survival at α=0.05. "
      "Contextualize: GMM and Ward also fail significance — algorithm choice is not the issue. "
@@ -463,11 +464,11 @@ DEFENSE_SCRIPTS = [
      "Contextualize: p-value alone can mislead with n=878 — V confirms association is weak in "
      "magnitude, not just non-significant. Reframe: Clustering adds descriptive phenotypes, not "
      "prognostic stratification. Value: Shows effect-size literacy beyond p-hacking."),
-    ("CV F1 ~0.809 vs test macro F1 0.507",
-     "Acknowledge: These numbers look contradictory. Contextualize: GridSearch scoring='f1' uses "
-     "binary F1 on positive class (class 1); macro F1 averages both classes including poor class-0. "
-     "Reframe: CV score reflects majority-class performance; macro F1 exposes minority failure. "
-     "Value: Metric literacy — we explain the mismatch proactively."),
+    ("Legacy f1 CV ~0.809 vs primary test macro F1 0.550",
+     "Acknowledge: Legacy binary-F1 tuning reported CV ~0.809 while primary test macro F1 is 0.550. "
+     "Contextualize: We now compare three objectives (f1, f1_macro, recall_macro) in Section 7.2. "
+     "Reframe: Primary model uses f1_macro (CV 0.579) aligned with test macro F1; legacy row kept for reference. "
+     "Value: Shows iterative optimization and metric literacy."),
     ("Baseline RF 68.18% below majority baseline 68.8%",
      "Acknowledge: Untuned RF underperforms predicting-all-survivors. Contextualize: Untuned model "
      "with 100 trees and default depth still tries to predict minority class, hurting accuracy. "
@@ -594,7 +595,7 @@ SLIDE_SECTION_MAP = [
     ("27", "Limitations", "8.4", "10 numbered items"),
     ("28", "Future Work", "8.5", "10 numbered items"),
     ("29", "Conclusion", "9", "Dynamic metrics recap"),
-    ("30", "Thank You / Q&A", "—", "Appendix slides 31–35 for backup"),
+    ("30", "Thank You / Q&A", "—", "Appendix slides A1–A8 for backup"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -876,22 +877,24 @@ SECTION_WALKTHROUGHS = {
     "7": {
         "title": "Section 7: Supervised Learning — Random Forest Classifier",
         "summary": (
-            "Justifies RF, trains baseline (68.18%), tunes with GridSearchCV (71.02%), evaluates with "
-            "full metric suite including overfitting audit, regularization comparison, and 4-model benchmark."
+            "Justifies RF, trains baseline (68.18%), compares three GridSearch objectives (f1 legacy, f1_macro primary, "
+            "recall_macro stretch), threshold sweep, full metric suite, regularization comparison, and 4-model benchmark."
         ),
         "functions": [
             "RandomForestClassifier(n_estimators=100, class_weight='balanced', random_state=42)",
-            "GridSearchCV(RF, param_grid, cv=StratifiedKFold(5), scoring='f1')",
+            "GridSearchCV(RF, param_grid, cv=StratifiedKFold(5), scoring='f1_macro')",
+            "GridSearchCV comparison: f1 (legacy grid), f1_macro, recall_macro",
+            "Threshold sweep on predict_proba (exploratory)",
             "accuracy_score, f1_score, roc_auc_score, confusion_matrix, classification_report",
-            "roc_curve, auc → roc_curve.png",
-            "sns.heatmap(confusion_matrix) → confusion_matrix.png",
-            "feature_importances_ → feature_importance.png",
+            "roc_curve, auc -> roc_curve.png",
+            "sns.heatmap(confusion_matrix) -> confusion_matrix.png",
+            "feature_importances_ -> feature_importance.png",
             "LR, SVC(RBF), GradientBoostingClassifier — comparison",
         ],
         "parameters": [
-            "param_grid: n_estimators [100,200,300], max_depth [3,5,10,15], min_samples_split [2,5], min_samples_leaf [1,2] → 108 combos",
-            "Best: 300 trees, depth 15, leaf 1, split 2",
-            "scoring='f1' — binary F1 on positive class for GridSearch",
+            "Legacy grid: 108 combos, scoring='f1' (reference row)",
+            "Regularized grid: 135 combos, scoring='f1_macro' (primary) and recall_macro (stretch)",
+            "Best primary: 100 trees, depth 5, leaf 4, split 10",
             "class_weight='balanced' on all classifiers",
         ],
         "outputs": [
@@ -900,25 +903,27 @@ SECTION_WALKTHROUGHS = {
             "Tuned model rf_tuned, metrics tables, overfitting analysis",
         ],
         "decisions_did": [
-            "GridSearch 108 combinations with 5-fold CV",
-            "Document 100% train vs 71% test overfitting",
-            "Compare regularized RF configs separately",
+            "Compare f1, f1_macro, and recall_macro tuning objectives",
+            "Adopt f1_macro winner as primary rf_tuned",
+            "Exploratory threshold sweep on test probabilities",
+            "Document 85.8% train vs 61.9% test overfitting (vs 100%/71% legacy)",
+            "Compare regularized RF configs including legacy f1 winner",
             "Benchmark LR, SVM, GB on same split",
-            "Retain RF despite SVM winning metrics — Gini importance for synthesis",
+            "Retain RF despite SVM winning some metrics — Gini importance for synthesis",
         ],
         "decisions_did_not": [
             "Did not use SMOTE", "Did not scale RF inputs",
             "Did not switch to SVM as primary — loses built-in importance",
         ],
         "interpretation": (
-            "Tuned RF achieves 71.02% accuracy (+2.27 pp over baseline) with AUC 0.613 and macro F1 0.507. "
-            "Severe overfitting (100% train) and poor class-0 recall (10.9%) documented honestly. "
-            "Top features: CEA, Prealbumin, CA19-9, Total Bilirubin, BMI."
+            "Primary f1_macro tuned RF: 61.93% test accuracy, macro F1 0.550, AUC 0.563, class-0 recall 36.4% (20/55). "
+            "Legacy f1 tuning retained as reference (71.02% acc, 0.507 macro F1, 10.9% recall). "
+            "Top features: CA19-9, CEA, Prealbumin, CRP/ALB, BMI."
         ),
         "professor_questions": [
             "Why RF over SVM if SVM has higher macro F1? — Gini importance required for Section 8 synthesis.",
-            "Why CV F1 0.809 but test macro F1 0.507? — Different metrics: binary F1 vs average of both classes.",
-            "Why 100% train accuracy? — Deep trees (depth=15) memorize; GridSearch optimized CV F1 not generalization.",
+            "Why retune with f1_macro if accuracy drops below baseline? — Macro F1 and class-0 recall align with evaluation goals under imbalance.",
+            "Why 85.8% train accuracy? — Regularized f1_macro grid reduces memorization vs legacy depth=15 model (100% train).",
         ],
     },
     "8": {

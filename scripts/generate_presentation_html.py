@@ -464,51 +464,56 @@ def build_slides() -> str:
         <div class="flow-h">
           <div class="fb">Baseline RF<br><small>100 trees / 68.18%</small></div>
           <div class="fa">&rarr;</div>
-          <div class="fb accent">GridSearchCV<br><small>108 combos / 5-fold</small></div>
+          <div class="fb accent">GridSearchCV<br><small>3 objectives / 5-fold</small></div>
           <div class="fa">&rarr;</div>
-          <div class="fb">Tuned RF<br><small>71.02% test</small></div>
+          <div class="fb">Tuned RF (f1_macro)<br><small>61.93% test</small></div>
         </div>
       </div>
       <div class="lr-right">
-        ''' + table("Best hyperparameters", ["Hyperparameter", "Value"], [
-            ["n_estimators", "300"], ["max_depth", "15"],
-            ["min_samples_split", "2"], ["min_samples_leaf", "1"],
+        ''' + table("Primary hyperparameters (f1_macro)", ["Hyperparameter", "Value"], [
+            ["n_estimators", "100"], ["max_depth", "5"],
+            ["min_samples_split", "10"], ["min_samples_leaf", "4"],
             ["class_weight", "balanced"],
-            ["CV scoring", "f1 (binary / class 1)"],
-            ["Best CV F1", "~0.809"],
+            ["CV scoring", "f1_macro (primary)"],
+            ["Best CV macro F1", "0.579"],
         ]) + '''
-        <p class="fn">* CV F1 optimizes positive-class F1, not macro F1 (see slide 23)</p>
+        ''' + table("Tuning comparison (test set)", ["Objective", "Macro F1", "AUC", "Cl-0 Recall"], [
+            ["f1 binary (legacy)", "0.507", "0.613", "10.9% (6/55)"],
+            ["f1_macro (primary)", "0.550", "0.563", "36.4% (20/55)"],
+            ["recall_macro", "0.550", "0.563", "36.4% (20/55)"],
+        ]) + '''
+        <p class="fn">Legacy f1 tuning hit 71.0% accuracy but 100% train overfit; f1_macro prioritizes balanced classes.</p>
       </div>
     </div>
-    ''', "Clarify CV F1 vs test macro F1 before slide 23."))
+    ''', "Walk through f1 vs f1_macro vs recall_macro comparison table."))
 
     # 20 Performance
     s.append(slide(20, "V", "Random Forest: Test Set Performance", f'''
-    <div class="banner">Test acc: <strong>71.02%</strong> vs baseline <strong>68.8%</strong> (+2.27 pp) &middot; Macro F1: <strong>0.507</strong> &middot; Class-0 recall: <strong>10.9% (6/55)</strong></div>
+    <div class="banner">Test acc: <strong>61.93%</strong> vs baseline <strong>68.8%</strong> (-6.87 pp) &middot; Macro F1: <strong>0.550</strong> &middot; Class-0 recall: <strong>36.4% (20/55)</strong></div>
     {dual_fig("confusion_matrix.png", "Confusion matrix (176-patient test set)", "classification_report.png", "Per-class precision, recall, F1")}
-    <div class="callout clinical"><strong>Clinical impact</strong><p>Model misses 49 of 55 high-risk patients. Research-grade, not clinic-ready &mdash; but better than baseline (0/55).</p></div>
+    <div class="callout clinical"><strong>Clinical impact</strong><p>Macro-aligned tuning flags 20/55 high-risk patients (up from 6/55 under legacy f1 tuning). Still misses 35/55 &mdash; research-grade, not clinic-ready.</p></div>
     ''', "Frame as modest improvement, not breakthrough."))
 
     # 21 ROC
     s.append(slide(21, "V", "Random Forest: ROC Curve",
-        fig_left_slide("roc_curve.png", "ROC curve with AUC = 0.613",
-            '<div class="banner">AUC = 0.613</div>' +
+        fig_left_slide("roc_curve.png", "ROC curve with AUC = 0.563",
+            '<div class="banner">AUC = 0.563</div>' +
             bullets([
                 "Above random (0.5) but below ~0.7 clinical utility",
-                "Reflects weak preoperative signal, not coding failure",
+                "Lower than legacy f1 tuning (0.613) by design - macro F1 trade-off",
                 "All benchmark models also AUC &lt; 0.63",
             ])
-        ), "Preempt 'is 0.613 good enough?'"))
+        ), "Preempt 'is 0.563 good enough?'"))
 
     # 22 Feature importance
     s.append(slide(22, "V", "Random Forest: Feature Importance",
         fig_left_slide("feature_importance.png", "All 20 Gini importances (top 5 highlighted)",
             '<h3>Top 5 (Gini)</h3>' + bullets([
-                "CEA &mdash; tumor marker",
-                "Prealbumin &mdash; nutritional reserve (low = poor prognosis)",
-                "CA19-9 &mdash; classic pancreatic marker",
-                "Total Bilirubin &mdash; obstructive jaundice burden",
-                "BMI &mdash; body composition",
+                "CEA - tumor marker",
+                "Prealbumin - nutritional reserve (low = poor prognosis)",
+                "CA19-9 - classic pancreatic marker",
+                "CRP/ALB - inflammatory ratio",
+                "BMI - body composition",
             ])
         ), "Tie back to EDA class-conditional findings."))
 
@@ -516,12 +521,12 @@ def build_slides() -> str:
     s.append(slide(23, "V", "Performance Context (Honest Transparency)", f'''
     <div class="transp">
       {bullets([
-          "Majority baseline = 68.8% &mdash; always report before tuned 71.02%",
-          "All feature-target |r| &lt; 0.15 &mdash; weak univariate signal",
+          "Majority baseline = 68.8% - accuracy alone is misleading under imbalance",
+          "All feature-target |r| &lt; 0.15 - weak univariate signal",
           "Missing staging, resectability, and treatment variables",
-          "Train accuracy 100% vs test 71% &mdash; 29 pp overfit gap documented",
-          "CV F1 ~0.809 uses binary F1 on class 1; test macro F1 = 0.507 averages both classes",
-          "Class-0 recall 10.9% despite class_weight='balanced'",
+          "Train 85.8% vs test 61.9% - 23.8 pp overfit gap (down from 29 pp legacy f1)",
+          "Retuned with scoring='f1_macro'; test macro F1 0.550 vs 0.507 legacy f1",
+          "Class-0 recall 36.4% (20/55) vs 10.9% (6/55) under legacy f1 tuning",
       ])}
       <div class="callout clinical hbox"><strong>Core finding</strong><p>{esc(CORE_FINDING)}</p></div>
     </div>
@@ -578,8 +583,8 @@ def build_slides() -> str:
       </div>
       <div class="lr-right">
         <h3>Model &amp; Analysis</h3>
-        <ol start="6"><li>Severe RF overfit (100% train vs 71% test)</li>
-        <li>Low class-0 recall (10.9%) &mdash; clinically insufficient alone</li>
+        <ol start="6"><li>RF overfit reduced but present (85.8% train vs 61.9% test)</li>
+        <li>Class-0 recall 36.4% (20/55) - improved vs legacy tuning but still insufficient alone</li>
         <li>K-Means assumes spherical, equal-variance clusters</li>
         <li>Multicollinearity may affect ratio-feature interpretation</li>
         <li>Cluster-survival association not significant (p=0.2546)</li>
@@ -605,7 +610,7 @@ def build_slides() -> str:
     # 29 Conclusion
     s.append(slide(29, "VII", "Conclusion", vt_list([
         ("1", "Supervised Learning",
-         "RF: 71.02% accuracy (+2.27 pp vs baseline), AUC 0.613, macro F1 0.507. Top features: CEA, Prealbumin, CA19-9."),
+         "RF (f1_macro tuned): 61.93% test accuracy, AUC 0.563, macro F1 0.550. Top features: CA19-9, CEA, Prealbumin."),
         ("2", "Unsupervised Learning",
          "K-Means k=3 identified three clinical phenotypes. Cluster 2 lowest survival (63.2%). Chi-square p = 0.2546."),
         ("3", "Synthesis",
@@ -647,17 +652,37 @@ def build_slides() -> str:
 
     s.append(slide("A5", "APP", "Appendix: Model Comparison Highlights",
         table("Supervised benchmark (Section 7.5)", ["Model", "Test Acc", "Macro F1", "AUC", "Cl-0 Recall"], [
-            ["RF (tuned)","71.0%","0.507","0.613","10.9% (6/55)"],
-            ["SVM RBF","~72%","0.590","0.622","Best among four"],
-            ["Logistic Regression","~72%","~0.55","~0.61","Higher than RF"],
-            ["Gradient Boosting","~71%","~0.51","~0.61","Moderate"],
-        ]) + '<p class="fn">RF retained for Gini importance &mdash; not highest metric model.</p>' +
+            ["RF (f1_macro tuned)","61.9%","0.550","0.563","36.4% (20/55)"],
+            ["SVM RBF","61.9%","0.590","0.622","56.4% (31/55)"],
+            ["Logistic Regression","55.1%","0.539","0.599","61.8% (34/55)"],
+            ["Gradient Boosting","63.6%","0.482","0.581","14.5% (8/55)"],
+        ]) + '<p class="fn">RF retained for Gini importance - f1_macro tuning improved macro F1 vs legacy f1 (0.507).</p>' +
         table("Unsupervised benchmark (Section 6.0, k=3)", ["Method", "Chi-sq p", "Assignment", "Selected?"], [
-            ["K-Means","0.2546","100%","Yes"],["GMM","~0.53","100%","Benchmark"],
-            ["Ward","~0.65","100%","Benchmark"],["DBSCAN","<0.01","~49%","Rejected"],
-        ]), "Backup for model choice questions."))
+            ["K-Means","0.2546","100%","Yes"],["GMM","0.5259","100%","Benchmark"],
+            ["Ward (k=3)","0.6478","100%","Benchmark"],["DBSCAN","0.0090","~49%","Rejected"],
+        ]), "Quick-reference table; see A6–A7 for full comparison figures."))
 
-    s.append(slide("A6", "APP", "Appendix: Preprocessing Decision Register",
+    s.append(slide("A6", "APP", "Appendix: Supervised Model Comparison (Section 7.5)", f'''
+    <p class="sub">Same train-test split (702/176), random_state=42 &mdash; from notebook Section 7.5</p>
+    {fig_img("supervised_model_comparison.png", "Test accuracy, macro F1, AUC-ROC, and class-0 recall across four classifiers")}
+    ''' + bullets([
+        "SVM RBF: highest macro F1 (0.590) and AUC (0.622)",
+        "RF (f1_macro): 36.4% class-0 recall (20/55) vs 10.9% under legacy f1 tuning",
+        "RF retained as primary model for built-in Gini importance (Section 8 synthesis)",
+        "All models: AUC &lt; 0.63 &mdash; no clinical utility threshold (0.7)",
+    ]) + '', "Point to bars during model-choice Q&amp;A."))
+
+    s.append(slide("A7", "APP", "Appendix: Unsupervised Method Comparison (Section 6.0)", f'''
+    <p class="sub">K-Means vs GMM vs Ward vs DBSCAN on scaled features (878 patients) &mdash; notebook Section 6.0</p>
+    {fig_img("unsupervised_model_comparison.png", "Silhouette, chi-square p-value, and survival spread at k=3")}
+    ''' + bullets([
+        "K-Means (k=3): selected &mdash; 100% assignment, interpretable centroids",
+        "Chi-square p = 0.2546 (not significant); clusters are phenotypes, not proven prognostic groups",
+        "DBSCAN: lower p but ~49% patients unassigned &mdash; rejected for defense cohort coverage",
+        "Silhouette best at k=2; k=3 chosen for three clinical profiles",
+    ]) + '', "Backup when panel asks why not GMM/DBSCAN."))
+
+    s.append(slide("A8", "APP", "Appendix: Preprocessing Decision Register",
         table("Full preprocessing register", ["Step", "Action", "Justification"],
             [(a, b, c) for a, b, c, _ in PREPROCESSING_EXTENDED]
         ), "Full register for audit questions."))

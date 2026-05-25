@@ -23,8 +23,8 @@ GLOBAL_SLIDE_MAKER_RULES = [
     "Always show figure source caption on chart slides: e.g., 'Source: PCSPF Capstone Analysis, n=878'.",
     "Include slide numbers on all slides except title (start numbering at agenda = slide 2).",
     "Preprocessing slides (10–14) are high priority for the professor—use clean tables, generous whitespace, and readable fonts.",
-    "Never claim statistical significance where p >= 0.05. Never claim 'excellent' model when AUC = 0.613.",
-    "Distinguish CV F1 (~0.809, class-1 F1) from test macro F1 (0.507)—use footnotes if both appear.",
+    "Never claim statistical significance where p >= 0.05. Never claim 'excellent' model when AUC = 0.563.",
+    "Report legacy f1 tuning (71.02% acc, 0.507 macro F1) alongside primary f1_macro model (61.93%, 0.550).",
     "K-Means slides must state that survival label was NOT used during clustering (only post-hoc overlay).",
     "Appendix slides 31–35: hide in main deck or place after Q&A; link from main slides only if needed.",
 ]

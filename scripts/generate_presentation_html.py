@@ -80,6 +80,7 @@ def vt_list(
     items: list[tuple[str, str, str]],
     compact: bool = False,
     balanced: bool = False,
+    grid: bool = False,
 ) -> str:
     """Vertical list: (marker, title, description)."""
     cls = "vt-list"
@@ -87,6 +88,8 @@ def vt_list(
         cls += " compact"
     if balanced:
         cls += " balanced"
+    if grid:
+        cls += " future-work-grid"
     rows = []
     for marker, title, desc in items:
         rows.append(
@@ -94,6 +97,59 @@ def vt_list(
             f"<div><strong>{esc(title)}</strong><p>{esc(desc)}</p></div></div>"
         )
     return f'<div class="{cls}">' + "".join(rows) + "</div>"
+
+
+def dual_table(title: str, headers: list[str], rows: list[list[str]]) -> str:
+    """Split a long table into two side-by-side tables (PDF-safe layout)."""
+    n = next_tbl()
+    mid = (len(rows) + 1) // 2
+    left = table(f"{title} (features 1-{mid})", headers, rows[:mid])
+    right = table(f"{title} (features {mid + 1}-{len(rows)})", headers, rows[mid:])
+    return f'<p class="tbl-label">Table {n}. {esc(title)}</p><div class="dual-table-layout">{left}{right}</div>'
+
+
+VIF_ROWS = [
+    ["CRP/ALB", "131.02", "High"],
+    ["CRP", "130.21", "High"],
+    ["Dir. Bilirubin", "77.61", "High"],
+    ["Tot. Bilirubin", "76.98", "High"],
+    ["SII", "18.30", "High"],
+    ["NLR", "12.38", "High"],
+    ["PLR", "8.21", "Moderate"],
+    ["Neutrocyte", "7.97", "Moderate"],
+    ["Platelet", "3.56", "Low"],
+    ["Lymphocyte", "3.29", "Low"],
+    ["Leukocyte", "2.48", "Low"],
+    ["ALB", "1.89", "Low"],
+    ["Sex", "1.61", "Low"],
+    ["Abdominal Pain", "1.58", "Low"],
+    ["Prealbumin", "1.38", "Low"],
+    ["Lactic Dehydrogenase", "1.22", "Low"],
+    ["Age", "1.10", "Low"],
+    ["BMI", "1.06", "Low"],
+    ["CA19-9", "1.03", "Low"],
+    ["CEA", "1.01", "Low"],
+]
+
+RF_TUNING_COMPARISON_ROWS = [
+    ["Test accuracy", "71.02%", "61.93%", "Legacy"],
+    ["vs 68.8% majority baseline", "+2.27 pp", "-6.87 pp", "Legacy"],
+    ["Train accuracy", "100.0%", "85.8%", "Primary"],
+    ["Overfit gap (train - test)", "29.0 pp", "23.8 pp", "Primary"],
+    ["Macro F1 (test)", "0.507", "0.550", "Primary"],
+    ["AUC-ROC (test)", "0.613", "0.563", "Legacy"],
+    ["Class-0 recall (test)", "10.9% (6/55)", "36.4% (20/55)", "Primary"],
+    ["CV score (GridSearch)", "0.809 (binary F1)", "0.579 (macro F1)", "—"],
+]
+
+RF_TUNING_PARAMS_ROWS = [
+    ["GridSearch scoring", "f1 (binary / class 1)", "f1_macro (primary)"],
+    ["Param grid", "Legacy (108 combos)", "Regularized (135 combos)"],
+    ["n_estimators", "300", "100"],
+    ["max_depth", "15", "5"],
+    ["min_samples_split", "2", "10"],
+    ["min_samples_leaf", "1", "4"],
+]
 
 
 def dual_fig(fn1: str, lbl1: str, fn2: str, lbl2: str) -> str:
@@ -111,6 +167,36 @@ def table(title: str, headers: list[str], rows: list[list[str]]) -> str:
     for row in rows:
         body += "<tr>" + "".join(f"<td>{esc(c)}</td>" for c in row) + "</tr>"
     return f'<p class="tbl-label">Table {n}. {esc(title)}</p><table class="dt"><thead><tr>{h}</tr></thead><tbody>{body}</tbody></table>'
+
+
+def table_bare(headers: list[str], rows: list[list[str]]) -> str:
+    h = "".join(f"<th>{esc(x)}</th>" for x in headers)
+    body = ""
+    for row in rows:
+        body += "<tr>" + "".join(f"<td>{esc(c)}</td>" for c in row) + "</tr>"
+    return f'<table class="dt"><thead><tr>{h}</tr></thead><tbody>{body}</tbody></table>'
+
+
+def paired_tables(
+    left_title: str,
+    left_headers: list[str],
+    left_rows: list[list[str]],
+    right_title: str,
+    right_headers: list[str],
+    right_rows: list[list[str]],
+) -> str:
+    """Two related tables side-by-side (PDF-safe appendix layout)."""
+    n_left = next_tbl()
+    n_right = next_tbl()
+    left = (
+        f'<div class="paired-tbl"><p class="tbl-mini-label">Table {n_left}. {esc(left_title)}</p>'
+        f"{table_bare(left_headers, left_rows)}</div>"
+    )
+    right = (
+        f'<div class="paired-tbl"><p class="tbl-mini-label">Table {n_right}. {esc(right_title)}</p>'
+        f"{table_bare(right_headers, right_rows)}</div>"
+    )
+    return f'<div class="dual-table-layout tuning-dual">{left}{right}</div>'
 
 
 def hero_orbs() -> str:
@@ -217,7 +303,7 @@ def build_slides() -> str:
         ("V", "Random Forest", "Model tuning, test performance, ROC/AUC, and feature importance"),
         ("VI", "Synthesis", "Bridging supervised predictions with unsupervised cluster structure"),
         ("VII", "Limitations & Conclusion", "Honest limitations, future work, and key takeaways"),
-    ], compact=True), "Walk structure in 45 seconds."))
+    ], compact=True), "Slide numbers are content IDs (1-29), not PDF page numbers. Part dividers add extra pages."))
 
     s.append(slide(0, "I", "Problem Context and Objectives", '<p class="dlbl">PART I</p>', divider=True))
 
@@ -605,7 +691,7 @@ def build_slides() -> str:
         ("8", "Resampling Methods", "Compare SMOTE/ADASYN against class_weight='balanced'."),
         ("9", "Patient Explainability", "Apply SHAP or LIME for individualized risk review."),
         ("10", "Nested Cross-Validation", "Obtain unbiased hyperparameter tuning estimates."),
-    ], compact=True), "Connect each item to a limitation from the previous slide."))
+    ], compact=True, grid=True), "Connect each item to a limitation from the previous slide."))
 
     # 29 Conclusion
     s.append(slide(29, "VII", "Conclusion", vt_list([
@@ -639,16 +725,8 @@ def build_slides() -> str:
     ''', "Per-class detail."))
 
     s.append(slide("A4", "APP", "Appendix: VIF Table (All 20 Features)",
-        table("Complete VIF scores", ["Feature", "VIF", "Level"], [
-            ["CRP/ALB","131.02","High"],["CRP","130.21","High"],
-            ["Dir. Bilirubin","77.61","High"],["Tot. Bilirubin","76.98","High"],
-            ["SII","18.30","High"],["NLR","12.38","High"],["PLR","8.21","Moderate"],
-            ["Neutrocyte","7.97","Moderate"],["Platelet","3.56","Low"],["Lymphocyte","3.29","Low"],
-            ["Leukocyte","2.48","Low"],["ALB","1.89","Low"],["Sex","1.61","Low"],
-            ["Abdominal Pain","1.58","Low"],["Prealbumin","1.38","Low"],
-            ["Lactic Dehydrogenase","1.22","Low"],["Age","1.10","Low"],["BMI","1.06","Low"],
-            ["CA19-9","1.03","Low"],["CEA","1.01","Low"],
-        ]), "Full VIF register."))
+        dual_table("Complete VIF scores", ["Feature", "VIF", "Level"], VIF_ROWS),
+        "Full VIF register — all 20 features in two columns for PDF readability."))
 
     s.append(slide("A5", "APP", "Appendix: Model Comparison Highlights",
         table("Supervised benchmark (Section 7.5)", ["Model", "Test Acc", "Macro F1", "AUC", "Cl-0 Recall"], [
@@ -660,7 +738,7 @@ def build_slides() -> str:
         table("Unsupervised benchmark (Section 6.0, k=3)", ["Method", "Chi-sq p", "Assignment", "Selected?"], [
             ["K-Means","0.2546","100%","Yes"],["GMM","0.5259","100%","Benchmark"],
             ["Ward (k=3)","0.6478","100%","Benchmark"],["DBSCAN","0.0090","~49%","Rejected"],
-        ]), "Quick-reference table; see A6–A7 for full comparison figures."))
+        ]), "Quick-reference table; see A6–A7 for figures and A9 for RF tuning comparison."))
 
     s.append(slide("A6", "APP", "Appendix: Supervised Model Comparison (Section 7.5)", f'''
     <p class="sub">Same train-test split (702/176), random_state=42 &mdash; from notebook Section 7.5</p>
@@ -686,6 +764,26 @@ def build_slides() -> str:
         table("Full preprocessing register", ["Step", "Action", "Justification"],
             [(a, b, c) for a, b, c, _ in PREPROCESSING_EXTENDED]
         ), "Full register for audit questions."))
+
+    s.append(slide("A9", "APP", "Appendix: RF Tuning Comparison (Section 7.2)", '''
+    <p class="sub">Legacy <code>f1</code> (binary) vs primary <code>f1_macro</code> &mdash; same split (702/176), random_state=42</p>
+    <div class="tuning-stack">
+    ''' + table(
+        "Performance comparison (held-out test set)",
+        ["Metric", "Legacy f1", "Primary f1_macro", "Better on"],
+        RF_TUNING_COMPARISON_ROWS,
+    ) + table(
+        "Best hyperparameters from GridSearchCV",
+        ["Setting", "Legacy f1", "Primary f1_macro"],
+        RF_TUNING_PARAMS_ROWS,
+    ) + '''
+    </div>
+    <div class="callout clinical compact tuning-note">
+      <strong>Why primary f1_macro was adopted</strong>
+      <p>Tuning aligns with our evaluation metric under class imbalance. Primary model improves macro F1 and class-0 recall (20/55 vs 6/55) with a smaller overfit gap, at the cost of test accuracy below the 68.8% majority baseline.</p>
+    </div>
+    <p class="fn">Stretch objective recall_macro selected the same params as f1_macro on this grid (Section 7.2).</p>
+    ''', "Backup when panel asks why accuracy dropped after retuning."))
 
     return "\n".join(s)
 
@@ -807,6 +905,23 @@ html,body{height:100%;overflow:hidden;font-family:'Poppins',sans-serif;backgroun
 .vt-list.compact .vt-item strong{font-size:1rem}
 .vt-list.compact .vt-item p{font-size:.94rem;line-height:1.42}
 .vt-list.compact .vt-num{min-width:2.1rem;height:2.1rem;font-size:.82rem}
+.vt-list.future-work-grid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem 1rem;align-content:start}
+.vt-list.future-work-grid .vt-item{padding:.65rem .85rem}
+.vt-list.future-work-grid .vt-item p{font-size:.88rem;line-height:1.4}
+
+/* --- Dual table layout (appendix) --- */
+.dual-table-layout{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start}
+.dual-table-layout .tbl-label{display:none}
+.dual-table-layout .dt{font-size:.82rem}
+.dual-table-layout .dt th,.dual-table-layout .dt td{padding:.35rem .45rem;font-size:.82rem;line-height:1.35}
+
+/* --- RF tuning appendix (A9) --- */
+.tuning-stack{display:flex;flex-direction:column;gap:.35rem;margin-bottom:.35rem}
+.tuning-stack .tbl-label{margin-bottom:.15rem}
+.tuning-stack .dt{font-size:.78rem;width:100%}
+.tuning-stack .dt th,.tuning-stack .dt td{padding:.3rem .55rem;line-height:1.32}
+.tuning-note{margin-top:.35rem}
+.slide[data-slide="A9"] .sb{gap:.3rem}
 
 /* --- Figure slides: image left, all text right --- */
 .fig-slide .lr-left{justify-content:center;align-items:center}

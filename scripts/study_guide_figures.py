@@ -270,11 +270,11 @@ FIGURE_GUIDE = [
     {
         "num": 16, "file": "confusion_matrix.png", "section": "7.3",
         "shows": "Tuned RF (f1_macro) predictions on 176-patient test set. 20/55 (36.4%) high-risk patients correctly identified (up from 6/55 under legacy f1 tuning).",
-        "interpretation": "Model predicts majority class well but misses 49 of 55 Class-0 patients (false negatives).",
+        "interpretation": "Model predicts majority class well but still misses 35 of 55 Class-0 patients (false negatives).",
         "clinical_interpretation": (
-            "Of 55 patients who actually died within a year, the model flagged only 6 - it would send 49 high-risk "
+            "Of 55 patients who actually died within a year, the model flagged 20 (36.4%) - it would still send 35 high-risk "
             "patients into the 'likely survivor' bucket. In clinical terms, that is dangerous as a standalone screening "
-            "tool, though it is slightly better than predicting everyone survives (0/55 caught)."
+            "tool, though it is improved versus legacy f1 tuning (6/55) and the majority baseline (0/55)."
         ),
         "implications": "Clinically insufficient for deployment; report per-class recall, not accuracy alone.",
         "clinical_implication": (
@@ -282,7 +282,7 @@ FIGURE_GUIDE = [
             "identifying which preoperative markers matter - CEA, prealbumin, CA19-9 - for building a future model "
             "with staging and treatment variables.'"
         ),
-        "point_out": "False negatives dominate - 49 high-risk patients missed.",
+        "point_out": "False negatives remain high - 35 high-risk patients missed (down from 49 under legacy tuning).",
         "dont_claim": "Do not claim model is 'safe' for clinical triage.",
     },
     {
@@ -291,7 +291,7 @@ FIGURE_GUIDE = [
         "interpretation": "Better than random but below ~0.7 threshold often cited for clinical utility.",
         "clinical_interpretation": (
             "AUC 0.563 means if you pick one patient who died within a year and one who survived, the model ranks "
-            "the higher-risk patient higher about 61% of the time - better than a coin flip, but far from the ~0.70+ "
+            "the higher-risk patient higher about 56% of the time - better than a coin flip, but far from the ~0.70+ "
             "discrimination oncologists want for treatment decisions."
         ),
         "implications": "Performance ceiling is data-limited; all benchmark models also AUC < 0.63.",

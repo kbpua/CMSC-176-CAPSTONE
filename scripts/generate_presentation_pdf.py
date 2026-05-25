@@ -349,6 +349,75 @@ html, body {{
 .vt-list.compact .vt-item strong {{ font-size: 25px !important; margin-bottom: 4px !important; }}
 .vt-list.compact .vt-item p {{ font-size: 22px !important; line-height: 1.38 !important; }}
 
+/* Future Work (slide 28) - two-column grid avoids compressed single-column overflow */
+.vt-list.future-work-grid {{
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px 28px !important;
+  align-content: start !important;
+  justify-content: stretch !important;
+}}
+.vt-list.future-work-grid .vt-item {{ padding: 12px 16px !important; }}
+.vt-list.future-work-grid .vt-item strong {{ font-size: 24px !important; }}
+.vt-list.future-work-grid .vt-item p {{ font-size: 21px !important; line-height: 1.42 !important; }}
+.slide[data-slide="28"] .sb {{ overflow: visible !important; }}
+
+/* Dual-table appendix (A4) - all 20 VIF rows visible in PDF */
+.dual-table-layout {{
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 24px !important;
+  align-items: start !important;
+  flex: 1 !important;
+}}
+.dual-table-layout .tbl-label {{ display: none !important; }}
+.dual-table-layout .dt {{ font-size: 19px !important; margin-bottom: 0 !important; }}
+.dual-table-layout .dt th, .dual-table-layout .dt td {{
+  padding: 7px 10px !important;
+  font-size: 19px !important;
+  line-height: 1.32 !important;
+}}
+.slide[data-slide="A4"] .sb {{ overflow: visible !important; }}
+.slide[data-slide="A4"] .st {{ margin-bottom: 14px !important; }}
+
+/* RF tuning comparison appendix (A9) - stacked full-width tables */
+.slide[data-slide="A9"] .sb {{ overflow: visible !important; gap: 8px !important; }}
+.slide[data-slide="A9"] .st {{ margin-bottom: 12px !important; padding-bottom: 8px !important; }}
+.slide[data-slide="A9"] .sub {{ font-size: 20px !important; margin-bottom: 8px !important; }}
+.slide[data-slide="A9"] .tuning-stack {{
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  margin-bottom: 6px !important;
+}}
+.slide[data-slide="A9"] .tbl-label {{
+  font-size: 18px !important;
+  margin-bottom: 4px !important;
+}}
+.slide[data-slide="A9"] .tuning-stack .dt {{
+  width: 100% !important;
+  font-size: 17px !important;
+  margin-bottom: 0 !important;
+}}
+.slide[data-slide="A9"] .tuning-stack .dt th, .slide[data-slide="A9"] .tuning-stack .dt td {{
+  padding: 5px 10px !important;
+  font-size: 17px !important;
+  line-height: 1.28 !important;
+}}
+.slide[data-slide="A9"] .tuning-note {{
+  padding: 10px 14px !important;
+  margin: 0 !important;
+  font-size: 18px !important;
+  line-height: 1.35 !important;
+}}
+.slide[data-slide="A9"] .tuning-note strong {{
+  font-size: 16px !important;
+  margin-bottom: 4px !important;
+  letter-spacing: 0.03em !important;
+}}
+.slide[data-slide="A9"] .tuning-note p {{ font-size: 18px !important; line-height: 1.35 !important; margin: 0 !important; }}
+.slide[data-slide="A9"] .fn {{ font-size: 16px !important; margin-top: 4px !important; }}
+
 /* Roadmap (legacy) */
 .roadmap {{
   display: grid !important;

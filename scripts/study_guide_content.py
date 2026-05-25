@@ -595,7 +595,7 @@ SLIDE_SECTION_MAP = [
     ("27", "Limitations", "8.4", "10 numbered items"),
     ("28", "Future Work", "8.5", "10 numbered items"),
     ("29", "Conclusion", "9", "Dynamic metrics recap"),
-    ("30", "Thank You / Q&A", "—", "Appendix slides A1–A8 for backup"),
+    ("30", "Thank You / Q&A", "—", "Appendix slides A1–A9 for backup"),
 ]
 
 # ---------------------------------------------------------------------------

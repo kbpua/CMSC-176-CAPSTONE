@@ -147,7 +147,7 @@ SLIDES = [
         "part": "PART II",
         "outline": [
             "Histogram grid: figures/feature_distributions.png (or key subset)",
-            "Right-skewed: CA19-9, CRP, CEA, bilirubin",
+            "Right-skewed: CEA, PLR/NLR/SII, CRP, bilirubin (CA19-9 moderate only)",
             "D'Agostino-Pearson: most non-normal (p < 0.05)",
             "Decision: no transformation (RF invariant; scaler for K-Means)",
         ],
@@ -194,6 +194,7 @@ SLIDES = [
             "Missing: zero (3 verification methods)",
             "Duplicates: zero",
             "Data clean—no imputation or deduplication needed",
+            "Dropped ID + NaN Predict labels; 878×21 frame; continuous labs pre-z-scored",
         ],
         "maker_notes": "Checklist visual with green checkmarks. This slide sets confidence before methodology slides.",
         "presenter_notes": "Speak slowly—professor audits preprocessing carefully.",
@@ -207,7 +208,7 @@ SLIDES = [
         "outline": [
             "IQR outlier method on 18 features",
             "Figure: figures/outlier_boxplots.png",
-            "Outliers on CA19-9, CRP, CEA, bilirubin—RETAINED (4 reasons)",
+            "Outliers on CEA, NLR/SII, CRP, bilirubin—RETAINED (CA19-9 = 0 IQR outliers; 4 reasons)",
             "Normality: D'Agostino-Pearson—most non-normal",
             "No transform applied",
         ],

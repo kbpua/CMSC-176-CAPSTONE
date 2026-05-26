@@ -386,7 +386,7 @@ def build_slides() -> str:
     s.append(slide(7, "II", "EDA: Feature Distributions and Skewness",
         fig_left_slide("feature_distributions.png", "Histograms + KDE for 18 continuous features",
             bullets([
-                "Right-skewed: CA19-9, CRP, CEA, bilirubin (heavy clinical tails)",
+                "Right-skewed: CEA, PLR/NLR/SII, CRP, bilirubin (CA19-9 moderate only)",
                 "D'Agostino-Pearson: most features non-normal (p &lt; 0.05)",
                 "Decision: no Yeo-Johnson transform (RF rank-invariant; scaler for K-Means)",
             ])
@@ -407,8 +407,6 @@ def build_slides() -> str:
         fig_left_slide("class_conditional_means.png", "Top 10 mean differences by survival class",
             bullets([
                 "Largest gaps: Abdominal Pain, CA19-9, Prealbumin, inflammatory markers",
-                "Boxplots show heavy overlap &mdash; weak univariate separation",
-                "Multivariate modeling still warranted",
             ])
         ), "Reinforce weak signal theme."))
 
@@ -428,6 +426,9 @@ def build_slides() -> str:
         ("4", "Imputation: Not Applied",
          "Because the released PCSPF file is complete, we did not introduce synthetic values. "
          "This preserves the original clinical cohort without imputation bias."),
+        ("5", "Column Cleaning and Released Scale",
+         "Dropped ID and Predict label 1/0 (100% NaN in raw file). Clean frame: 878 rows &times; 21 columns "
+         "(20 features + target). Continuous labs are pre-z-scored in the released PCSPF file (mean &asymp; 0, std &asymp; 1)."),
     ]), "Speak slowly; professor audits preprocessing."))
 
     # 11 Outliers
@@ -435,7 +436,7 @@ def build_slides() -> str:
         fig_left_slide("outlier_boxplots.png", "Per-feature z-score boxplots with IQR outliers",
             '<p><strong>IQR rule (1.5&times;)</strong> on 18 continuous features</p>' +
             bullets([
-                "Extreme values on CA19-9, CRP, CEA, bilirubin &mdash; retained",
+                "Extreme values on CEA, CRP, inflammatory ratios, and bilirubin &mdash; retained",
                 "Clinically severe patients, not recording errors",
                 "Removing outliers would bias toward healthier cases",
                 "No normality transform applied (RF rank-invariant)",

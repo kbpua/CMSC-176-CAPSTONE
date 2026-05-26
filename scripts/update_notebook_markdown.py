@@ -59,6 +59,29 @@ SYNTHESIS_CELL = """**Ranking comparison (Section 8.1).** Random Forest Gini imp
 
 CONVERGENCE_PARA = """**Partial convergence.** Only CRP/ALB ranks in both top-5 lists. RF and K-Means weight different markers because prediction and phenotype grouping are different tasks. Together they still support a coherent clinical story about tumor burden, nutrition, and inflammation - without implying the same features drive both analyses equally."""
 
+TEXT_REPLACEMENTS = [
+    (
+        "This imbalance will be addressed later with class_weight='balanced' in Random Forest.",
+        "This imbalance will be addressed with class_weight='balanced' in Random Forest and evaluated with macro F1 and class-0 recall rather than accuracy alone.",
+    ),
+    (
+        "We will use class_weight='balanced' in Random Forest and emphasize F1-score and AUC-ROC in evaluation.",
+        "We address this with class_weight='balanced' in Random Forest and evaluate with **macro F1**, **class-0 recall**, AUC-ROC, and the full classification report—not accuracy alone. Hyperparameter tuning in Section 7.2 uses `scoring='f1_macro'` so the GridSearch objective matches our primary test metrics.",
+    ),
+    (
+        "Evaluation emphasizes F1-score, AUC-ROC, confusion matrix, and full classification report rather than accuracy alone.",
+        "Primary evaluation metrics are **macro F1** and **class-0 recall** (both classes matter under imbalance), plus AUC-ROC, confusion matrix, and classification report. GridSearchCV in Section 7.2 tunes with `scoring='f1_macro'`; legacy `scoring='f1'` is retained only as a reference comparison row.",
+    ),
+    (
+        "imbalance handling via class_weight='balanced' is essential.",
+        "imbalance handling via class_weight='balanced' is essential, with Section 7.2 tuning RF using `f1_macro` to align optimization with macro F1 evaluation.",
+    ),
+    (
+        "Overall performance should exceed the 68.8% majority baseline. AUC near 0.7-0.8 is acceptable for clinical screening contexts.",
+        "The primary **f1_macro** tuned model prioritizes balanced class performance over majority-class accuracy: test accuracy (~61.9%) may fall **below** the 68.8% baseline while macro F1 (0.550) and class-0 recall (36.4%) improve versus legacy `f1` tuning. AUC-ROC (0.563) remains below the ~0.7 clinical utility threshold.",
+    ),
+]
+
 CELL_153 = """### 7.5 Model Comparison: Benchmarking Random Forest Against Alternatives
 
 To validate our model choice, we benchmarked the **f1_macro tuned** Random Forest against three alternatives - Logistic Regression, SVM RBF, and Gradient Boosting - on the same train-test split with the same random seed.
@@ -89,6 +112,14 @@ def main():
             cell["source"].pop()
         cell.pop("outputs", None)
         cell.pop("execution_count", None)
+
+    for cell in nb["cells"]:
+        src = "".join(cell.get("source", []))
+        if cell.get("cell_type") != "markdown":
+            continue
+        for old, new in TEXT_REPLACEMENTS:
+            if old in src:
+                cell["source"] = [line.replace(old, new) for line in cell["source"]]
 
     for cell in nb["cells"]:
         src = "".join(cell.get("source", []))

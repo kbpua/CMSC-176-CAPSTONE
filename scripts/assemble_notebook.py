@@ -294,10 +294,10 @@ plt.savefig("figures/class_conditional_means.png", dpi=300, bbox_inches="tight")
 plt.show()
 """))
     cells.append(md(
-        "CA19-9, inflammatory markers, and NLR/SII show the largest absolute mean gaps. "
-        "Clinically, higher tumor burden and systemic inflammation associate with shorter "
-        "survival, while higher prealbumin associates with better outcomes. Binary Abdominal "
-        "Pain also differs between classes. These patterns align with pancreatic cancer "
+        "By |mean| difference, CA19-9 leads (0.305), followed by Prealbumin, Neutrocyte, "
+        "Abdominal Pain, and inflammatory indices (SII, NLR, CRP). Class 0 (died <1 yr) "
+        "shows higher CA19-9, Abdominal Pain, and inflammatory markers; Class 1 (survived "
+        "≥1 yr) shows higher Prealbumin. These patterns align with pancreatic cancer "
         "prognostic literature but remain modest at the univariate level."
     ))
 
@@ -406,8 +406,11 @@ plt.savefig("figures/outlier_boxplots.png", dpi=300, bbox_inches="tight")
 plt.show()
 """))
     c.append(md(
-        "CA19-9, CRP, CEA, and bilirubin features show the highest outlier percentages, "
-        "predominantly upper-tail extremes consistent with skewed oncology labs."
+        "CEA shows the highest outlier rate (10.4%; 91/878), followed by NLR (6.8%), SII (6.3%), "
+        "bilirubin (~5-6%), and CRP/CRP/ALB (~5.6%)—predominantly upper-tail extremes consistent with "
+        "skewed oncology and inflammation labs. CA19-9 registers 0% under the 1.5×IQR rule: its wide "
+        "interquartile range absorbs all observed values, so no points appear beyond the boxplot whiskers "
+        "despite right skew in Section 3.3."
     ))
     c.append(md(
         "**Decision: Do NOT remove outliers.** (1) Clinical validity: extreme labs are "
@@ -445,7 +448,10 @@ display(skew_tbl.round(4))
 """))
     c.append(md(
         "Most continuous features are significantly non-normal by D'Agostino-Pearson "
-        "(p < 0.05). CA19-9, CRP, CEA, and bilirubin markers are among the most skewed."
+        "(p < 0.05). The heaviest right skew is on CEA (skew ≈ 23.9), followed by "
+        "inflammatory ratios (PLR, Neutrocyte, NLR, SII) and lactic dehydrogenase; CRP, "
+        "CRP/ALB, and bilirubin pairs are also skewed. CA19-9 is only moderately skewed "
+        "(|skew| ≈ 0.55), well below the tail-heavy tumor and inflammation markers above."
     ))
     c.append(md(
         "**Decision: Do NOT apply Yeo-Johnson, Box-Cox, or log transformation.** "

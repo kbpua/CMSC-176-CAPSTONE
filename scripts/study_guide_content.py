@@ -329,7 +329,7 @@ PREPROCESSING_EXTENDED = [
      "0 duplicate rows confirmed.",
      "If removed aggressively: no duplicates exist anyway."),
     ("Outliers", "Retained all",
-     "IQR/z-score documented; extremes are clinically severe patients.",
+     "IQR documented; highest on CEA (10.4%), NLR/SII, CRP, bilirubin; CA19-9 = 0% (wide IQR).",
      "If removed: lose 5–10% of data including highest-risk cases; bias toward mild disease."),
     ("Normality transform (Yeo-Johnson)", "Not applied",
      "RF rank-invariant; StandardScaler sufficient for K-Means.",
@@ -548,8 +548,8 @@ QA_BANK = [
      "TNM staging or resectability status — strongest prognostic factor missing from preoperative "
      "labs-only dataset; would likely raise AUC substantially."),
     ("Why retain outliers instead of capping?",
-     "Extreme CA19-9/CRP values identify severe disease; capping would compress signal from "
-     "sickest patients."),
+     "Extreme CEA/CRP/inflammation values identify severe disease; capping would compress signal from "
+     "sickest patients. CA19-9 is prognostically important in EDA/RF but registers 0% IQR outliers here."),
     ("Why D'Agostino-Pearson instead of Shapiro-Wilk?",
      "Shapiro-Wilk is recommended for n < 5000 but degrades with large n; D'Agostino-Pearson "
      "handles n=878 continuous features appropriately."),
@@ -576,7 +576,7 @@ SLIDE_SECTION_MAP = [
     ("7", "Feature Distributions", "3.3, 4.5", "feature_distributions.png"),
     ("8", "Correlation / Multicollinearity", "3.5–3.6, 4.6", "correlation_heatmap.png"),
     ("9", "Class-Conditional Differences", "3.4, 3.7", "class_conditional_means.png, boxplots"),
-    ("10", "Data Quality Checks", "4.1–4.3", "Types, nulls, duplicates"),
+    ("10", "Data Quality Checks", "4.1–4.3", "Types, nulls, duplicates, column drops, pre-z-scored labs"),
     ("11", "Outliers & Normality", "4.4–4.5", "outlier_boxplots.png"),
     ("12", "VIF & Feature Decisions", "4.6–4.8", "VIF table in notebook"),
     ("13", "Preprocessing Summary", "4.10", "preprocessing_summary.png"),
@@ -729,11 +729,11 @@ SECTION_WALKTHROUGHS = {
         ],
         "interpretation": (
             "Weak univariate signal and strong inter-feature correlation. Right-skewed tumor/inflammation "
-            "markers. Modest class-conditional differences on CA19-9, Prealbumin, Abdominal Pain. "
+            "markers. Modest class-conditional differences led by CA19-9, then Prealbumin, Neutrocyte, Abdominal Pain. "
             "Multivariate nonlinear models warranted."
         ),
         "professor_questions": [
-            "Strongest correlate with survival? — All |r| < 0.15; Abdominal Pain among largest mean diffs.",
+            "Strongest correlate with survival? — All |r| < 0.15; CA19-9 leads |mean| diffs (Abdominal Pain ranks 4th).",
             "Why Pearson not Spearman? — Pearson standard for z-scored continuous; rank correlation similar here.",
             "Does EDA prove RF will work? — No; it sets realistic expectations for modest AUC.",
         ],
@@ -775,13 +775,17 @@ SECTION_WALKTHROUGHS = {
             "No imputation", "No SMOTE", "No feature dropping", "No outlier removal",
         ],
         "interpretation": (
-            "Data quality is high (zero nulls, zero duplicates). Non-normal distributions documented "
-            "but not corrected for RF. Multicollinearity acknowledged but retained for clinical validity."
+            "Data quality is high (zero nulls, zero duplicates). IQR outliers are highest on CEA (10.4%), "
+            "NLR (6.8%), SII (6.3%), bilirubin (~5-6%), and CRP/CRP/ALB (~5.6%); CA19-9 = 0% because its wide "
+            "IQR absorbs the upper tail. Heaviest skew: CEA, PLR/NLR/SII, then CRP/bilirubin; "
+            "CA19-9 moderately skewed only. Non-normal distributions documented but not corrected for RF. "
+            "Multicollinearity acknowledged but retained for clinical validity."
         ),
         "professor_questions": [
             "Why not drop NLR when VIF is high? — RF handles collinearity; NLR is clinically standard.",
             "Why D'Agostino-Pearson not Shapiro-Wilk? — n=878 too large for Shapiro assumptions.",
             "Four reasons to keep outliers? — Clinical severity, not errors; removal biases sample.",
+            "Why no dots on CA19-9 in the outlier boxplot? — Wide IQR; max z-score stays inside the 1.5x fence.",
         ],
     },
     "5": {

@@ -23,7 +23,10 @@ FIGURE_GUIDE = [
     {
         "num": 2, "file": "feature_distributions.png", "section": "3.3",
         "shows": "4x5 grid of histograms + KDE for 18 continuous preoperative features.",
-        "interpretation": "Right-skewed distributions on CA19-9, CRP, CEA, and bilirubin. Released file values are already z-scored (mean~0, std>=1).",
+        "interpretation": (
+            "Heaviest right skew on CEA, inflammatory ratios (PLR, Neutrocyte, NLR, SII), CRP, and bilirubin. "
+            "CA19-9 is moderately skewed only (Section 4.5). Released file values are already z-scored (mean~0, std>=1)."
+        ),
         "clinical_interpretation": (
             "Most tumor markers and inflammation labs have long right tails - a few patients with very high CA19-9, "
             "CRP, or bilirubin. Clinically, those extremes often reflect advanced obstructive jaundice, heavy "
@@ -93,19 +96,22 @@ FIGURE_GUIDE = [
     {
         "num": 6, "file": "outlier_boxplots.png", "section": "4.4",
         "shows": "Per-feature z-score boxplots highlighting IQR outliers.",
-        "interpretation": "Outliers concentrate on CA19-9, CRP, CEA, and bilirubin - extreme lab values, not data errors.",
+        "interpretation": (
+            "Outliers concentrate on CEA (10.4%), NLR/SII, CRP/CRP/ALB, and bilirubin - extreme lab values, not data errors. "
+            "CA19-9 has zero IQR outliers (wide Q1-Q3 spread); its right skew appears in histograms (Section 3.3), not as dots beyond these whiskers."
+        ),
         "clinical_interpretation": (
-            "The flagged outliers are exactly the markers that spike in aggressive pancreatic cancer: markedly elevated "
-            "CA19-9 or CEA, high CRP from inflammation, and bilirubin from biliary obstruction. These patients are "
-            "often the most clinically complex - not statistical noise."
+            "Flagged outliers reflect severe preoperative disease: CEA reaches the most extreme z-scores (~27), "
+            "with inflammatory indices (NLR, SII, PLR, Neutrocyte) and bilirubin also extending past z~10. "
+            "CA19-9 remains clinically relevant in EDA and RF importance even though the IQR rule flags zero outliers here."
         ),
         "implications": "Supports retaining all outliers; removal would discard the sickest patients.",
         "clinical_implication": (
-            "Defense line: 'We kept outliers because removing a CA19-9 of 1000 or bilirubin in obstructive jaundice "
-            "would mean training on a healthier, easier subset.' That would inflate accuracy and misrepresent real preoperative practice."
+            "Defense line: 'We kept outliers because removing a CEA spike or bilirubin in obstructive jaundice would mean training "
+            "on a healthier, easier subset.' Mention CA19-9 separately as a tumor marker in RF importance, not as an IQR outlier on this figure."
         ),
-        "point_out": "Outliers = clinical severity, not noise.",
-        "dont_claim": "Do not say outliers were removed or winsorized.",
+        "point_out": "CEA leads IQR outlier counts; CA19-9 = 0% under the 1.5x rule.",
+        "dont_claim": "Do not say outliers were removed or winsorized. Do not claim CA19-9 shows IQR outliers on this chart.",
     },
     {
         "num": 7, "file": "preprocessing_summary.png", "section": "4.10",
